@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Code Genius eSports</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="parallax.css">
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <header>
+        <div class="nav-inner">
+            <div class="logo">
+                CODE GENIUS
+                <span>eSports Club</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#inicio">Inicio</a></li>
+                    <li><a href="#equipo">Equipo</a></li>
+                    <li><a href="#jugadores">Jugadores</a></li>
+                    <li><a href="https://discord.gg/X8et7fHn">Unete</a></li>
+                    <li><a href="#tutoriales">Tutoriales</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- SECCION INICIAL -->
+    <section id="inicio" class="parallax">
+        <div class="parallax-content">
+            <p class="tagline">eSports Club</p>
+            <h1 class="hero-title">
+                Bienvenido a <br><span>Code Genius</span>
+            </h1>
+
+            <div class="hero-buttons">
+                <a href="https://discord.gg/Ty3hXmCp" class="btn btn-primary">Unete al club</a>
+                <a href="#equipos" class="btn btn-ghost">Ver nuestros equipos</a>
+            </div>
+        </div>
+
+        <div class="hero-socials">
+            <!-- YouTube -->
+            <a href="https://youtube.com" target="_blank" class="social-icon" aria-label="YouTube">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M21.8 8.001a2.75 2.75 0 0 0-1.93-1.95C18.1 5.5 12 5.5 12 5.5s-6.1
+                         0-7.87.55A2.75 2.75 0 0 0 2.2 8C1.75 9.78 1.75 12 1.75 12s0 2.22.45 
+                         4.001a2.75 2.75 0 0 0 1.93 1.95C5.9 18.5 12 18.5 12 18.5s6.1 0 7.87-.55a2.75
+                          2.75 0 0 0 1.93-1.95C22.25 14.22 22.25 12 22.25 12s0-2.22-.45-3.999zM10 15.25v-6.5L15.5 12 10 15.25z" />
+                </svg>
+            </a>
+
+            <!-- Twitch -->
+            <a href="https://www.twitch.tv/codegeniusmkw" target="_blank" class="social-icon" aria-label="Twitch">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M3 2h18v12.5l-4 3.5h-4l-3 3H7v-3H3V2zm2 2v11h4v3l2.5-2.5H15l3-2.5V4H5zm9 2h2v6h-2V6zm-5 0h2v6H9V6z" />
+                </svg>
+            </a>
+
+            <!-- Instagram -->
+            <a href="https://www.instagram.com/codegeniusmkw/" target="_blank" class="social-icon"
+                aria-label="Instagram">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M7 2C4.24 2 2 4.24 2 7v10c0 2.76 2.24 5 5 5h10c2.76 
+            0 5-2.24 5-5V7c0-2.76-2.24-5-5-5H7zm10 2c1.65 0 3 1.35 
+            3 3v10c0 1.65-1.35 3-3 3H7c-1.65 0-3-1.35-3-3V7c0-1.65 
+            1.35-3 3-3h10zm-5 3.5A5.5 5.5 0 1 0 17.5 13 5.51 5.51 
+            0 0 0 12 7.5zm0 2A3.5 3.5 0 1 1 8.5 13 3.5 3.5 0 0 
+            1 12 9.5zm4.25-.75a1.25 1.25 0 1 0-.0001-2.5 1.25 1.25 
+            0 0 0 .0001 2.5z" />
+                </svg>
+            </a>
+
+            <!-- TikTok -->
+            <a href="https://www.tiktok.com/@codegeniusmkw" target="_blank" class="social-icon" aria-label="TikTok">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12.5 2h2.8c.2 1.5.9 2.8 2 3.8a6 6 0 0 0 3.7
+                     1.3v2.8a8.7 8.7 0 0 1-3.4-.8v6.5a6.5 6.5 0 1 1-5.9-6.4v3a3.1 3.1 0 1 0 2 2.9V2z" />
+                </svg>
+            </a>
+
+            <!-- X / Twitter -->
+            <a href=" https://x.com/CodegeniusMK" target="_blank" class="social-icon" aria-label="X Twitter">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 3h4.5L13 10.1 18.5 3H21l-7 9.2 7 8.8h-4.5L11 14l-5.5 7H3l7-9.1z" />
+                </svg>
+            </a>
+
+            <!-- Discord -->
+            <a href="https://discord.gg/X8et7fHn" target="_blank" class="social-icon" aria-label="Discord">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20.22 4.02a19.6 19.6 0 0 0-4.27-1.35.1.1 0 0 0-.1.05c-.18.33-.38.76-.52 1.1a17.5 
+        17.5 0 0 0-6.64 0c-.14-.34-.34-.77-.52-1.1a.1.1 0 0 0-.1-.05c-1.47.27-2.91.73-4.27 
+        1.35a.1.1 0 0 0-.05.04C1.55 8.2.97 12.3 1.35 16.36a.1.1 0 0 0 .03.06 19.4 19.4 0 0 0 
+        5.2 2.72.1.1 0 0 0 .12-.05c.4-.55.76-1.14 1.08-1.73a.1.1 0 0 0-.06-.15 12.9 12.9 0 
+        0 1-1.86-.88.1.1 0 0 1-.01-.17c.12-.09.24-.18.36-.27a.1.1 0 0 1 .1-.01c3.93 1.82 
+        8.2 1.82 12.12 0a.1.1 0 0 1 .1.01c.12.09.24.18.36.27a.1.1 0 0 1 0 .17 12.3 12.3 0 0 
+        1-1.86.88.1.1 0 0 0-.06.15c.32.59.68 1.18 1.08 1.73a.1.1 0 0 0 .12.05 19.7 19.7 0 
+        0 0 5.2-2.72.1.1 0 0 0 .03-.06c.46-4.25-.17-8.33-2.77-12.3a.1.1 0 0 0-.05-.04zM8.7 
+        15.5c-1 0-1.8-.94-1.8-2.1 0-1.17.8-2.1 1.8-2.1 1 0 1.82.96 1.8 2.1 0 1.16-.8 2.1-1.8 
+        2.1zm6.6 0c-1 0-1.8-.94-1.8-2.1 0-1.17.8-2.1 1.8-2.1 1 0 1.82.96 1.8 2.1 0 1.16-.8 2.1-1.8 
+        2.1z" />
+                </svg>
+            </a>
+        </div>
+    </section>
+
+
+    <!---- SECCION SOBRE NOSOTROS ---->
+    <section class="section section--about" id="sobrecg">
+        <h2 class="section-title">Sobre Code Genius</h2>
+        <p class="section-subtitle">Club & Filosofía</p>
+
+        <div class="about-inner">
+            <div class="grid-2 about-grid">
+                <div class="about-text">
+                    <p>
+                        Lorem ipsum dolor sit amet consectetur adipiscing elit cubilia erat eleifend,
+                        pretium hac penatibus accumsan praesent nunc primis facilisis tortor, euismod
+                        congue maecenas quam vestibulum bibendum nec diam etiam. Praesent dis nascetur
+                        hendrerit parturient curabitur, auctor gravida magna lobortis. Ad fames aptent
+                        phasellus per viverra est, dignissim molestie turpis orci morbi, ultrices
+                        ullamcorper commodo rhoncus conubia.
+                    </p>
+                </div>
+                <div class="about-media">
+                    <div class="about-video-wrapper">
+                        <iframe src="https://www.youtube.com/embed/seoguihaegsouh" title="Video promocional Code Genius"
+                            frameborder="0" allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- PARALLAX ESPACIO -->
+    <section class="space-banner">
+        <div class="space-banner-inner">
+            <div class="space-logo-big">
+                <div class="space-logo-glow"></div>
+                <img src="img/cglogo.png" alt="Logo Code Genius">
+            </div>
+        </div>
+    </section>
+
+
+    <!-- SECCION CALENDARIO -->
+    <section id="calendario">
+        <div class="section calendario-inner">
+            <h2 class="section-title">Calendario de partidos</h2>
+            <p class="section-subtitle">Próximos enfrentamientos</p>
+
+            <div class="calendar-grid">
+                <!-- Partido Derrota -->
+                <article class="match-card status-lost">
+                    <h3 class="match-title">Code Genius vs Severance</h3>
+
+                    <div class="match-date">
+                        <span class="day">12</span>
+                        <span class="month">ENE</span>
+                        <span class="time">21:30</span>
+                    </div>
+
+                    <p class="match-outcome match-outcome--loss">
+                        Derrota
+                    </p>
+
+                    <p class="match-meta">498 - 492</p>
+                </article>
+
+                <!-- Partido Empate -->
+                <article class="match-card status-upcoming">
+                    <h3 class="match-title">Code Genius vs JetJorker</h3>
+
+                    <div class="match-date">
+                        <span class="day">23</span>
+                        <span class="month">ENE</span>
+                        <span class="time">20:00</span>
+                    </div>
+
+                    <p class="match-outcome match-outcome--draw">
+                        Empate
+                    </p>
+
+                    <p class="match-meta">496 - 496</p>
+                </article>
+
+                <!-- Partido Victoria -->
+                <article class="match-card status-winned">
+                    <h3 class="match-title">Code Genius vs Dynamite</h3>
+
+                    <div class="match-date">
+                        <span class="day">05</span>
+                        <span class="month">DIC</span>
+                        <span class="time">22:00</span>
+                    </div>
+
+                    <p class="match-outcome match-outcome--win">
+                        Victoria
+                    </p>
+
+                    <p class="match-meta">498 - 492</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- CALENDARIO SOCIAL -->
+    <section id="calendario-social">
+        <div class="calendario-social-inner">
+            <h2 class="section-title">Calendario social</h2>
+            <p class="section-subtitle">Eventos del club</p>
+
+            <div class="social-calendar-grid">
+
+                <!-- Evento 1 -->
+                <article class="social-card">
+                    <h3 class="social-title">Scrim interna CG1 vs CG2</h3>
+                    <div class="social-date">
+                        <span class="day">18</span>
+                        <span class="month">ENE</span>
+                        <span class="time">19:30</span>
+                    </div>
+                    <p class="social-meta">
+                        War interna
+                    </p>
+                </article>
+
+                <!-- Evento 2 -->
+                <article class="social-card">
+                    <h3 class="social-title">Sesion de coaching con Sipgb</h3>
+                    <div class="social-date">
+                        <span class="day">20</span>
+                        <span class="month">ENE</span>
+                        <span class="time">21:00</span>
+                    </div>
+                    <p class="social-meta">
+                        Analisis en stream
+                    </p>
+                </article>
+
+                <!-- Evento 3 -->
+                <article class="social-card">
+                    <h3 class="social-title">Partidas con la comunidad</h3>
+                    <div class="social-date">
+                        <span class="day">27</span>
+                        <span class="month">ENE</span>
+                        <span class="time">22:30</span>
+                    </div>
+                    <p class="social-meta">
+                        Partidas con la comunidad
+                    </p>
+                </article>
+
+            </div>
+        </div>
+    </section>
+
+<!-- BANNER CODE GENIUS -->
+<section class="cg-strip">
+    <div class="cg-strip-inner">
+        <div class="cg-pill">
+            <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
+            <span class="cg-text">Code Genius</span>
+        </div>
+        <div class="cg-pill">
+            <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
+            <span class="cg-text">Code Genius</span>
+        </div>
+        <div class="cg-pill">
+            <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
+            <span class="cg-text">Code Genius</span>
+        </div>
+        <div class="cg-pill">
+            <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
+            <span class="cg-text">Code Genius</span>
+        </div>
+        <div class="cg-pill">
+            <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
+            <span class="cg-text">Code Genius</span>
+        </div>
+        <div class="cg-pill">
+            <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
+            <span class="cg-text">Code Genius</span>
+        </div>
+        <div class="cg-pill">
+            <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
+            <span class="cg-text">Code Genius</span>
+        </div>
+        <div class="cg-pill">
+            <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
+            <span class="cg-text">Code Genius</span>
+        </div>
+        <div class="cg-pill">
+            <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
+            <span class="cg-text">Code Genius</span>
+        </div>
+        <div class="cg-pill">
+            <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
+            <span class="cg-text">Code Genius</span>
+        </div>
+
+        <div class="cg-pill">
+            <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
+            <span class="cg-text">Code Genius</span>
+        </div>
+        <div class="cg-pill">
+            <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
+            <span class="cg-text">Code Genius</span>
+        </div>
+        <div class="cg-pill">
+            <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
+            <span class="cg-text">Code Genius</span>
+        </div>
+        <div class="cg-pill">
+            <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
+            <span class="cg-text">Code Genius</span>
+        </div>
+        <div class="cg-pill">
+            <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
+            <span class="cg-text">Code Genius</span>
+        </div>
+        <div class="cg-pill">
+            <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
+            <span class="cg-text">Code Genius</span>
+        </div>
+        <div class="cg-pill">
+            <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
+            <span class="cg-text">Code Genius</span>
+        </div>
+        <div class="cg-pill">
+            <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
+            <span class="cg-text">Code Genius</span>
+        </div>
+        <div class="cg-pill">
+            <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
+            <span class="cg-text">Code Genius</span>
+        </div>
+        <div class="cg-pill">
+            <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
+            <span class="cg-text">Code Genius</span>
+        </div>
+    </div>
+</section>
+
+
+    <!-- SECCION EQUIPOS -->
+    <section id="equipos">
+        <div class="equipos-inner">
+            <h2 class="section-title">Nuestros equipos</h2>
+            <p class="section-subtitle">Rosters competitivos</p>
+
+            <div class="teams-grid">
+                <div class="team-card">
+                    <div class="team-label">Equipo principal</div>
+                    <div class="team-name">Code Genius</div>
+                    <div class="team-meta">
+                        Roster orientado a ligas y torneos online de máximo nivel competitivo.
+                    </div>
+                    <div class="team-tags">
+                        <span class="team-tag">Jugadores de alto nivel</span>
+                        <span class="team-tag">Scrims diarios</span>
+                        <span class="team-tag">Coaching avanzado</span>
+                        <span class="team-tag">Contenido de calidad</span>
+                    </div>
+                </div>
+
+                <div class="team-card">
+                    <div class="team-label">Equipo secundario</div>
+                    <div class="team-name">Code Genesis</div>
+                    <div class="team-meta">
+                        Roster orientado a ligas y torneos online de máximo nivel competitivo.
+                    </div>
+                    <div class="team-tags">
+                        <span class="team-tag">Jugadores de alto nivel</span>
+                        <span class="team-tag">Scrims diarios</span>
+                        <span class="team-tag">Coaching avanzado</span>
+                        <span class="team-tag">Contenido de calidad</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+  <!-- PARALLAX ESPACIO -->
+    <section class="space-banner1">
+        <div class="space-banner-inner1">
+            <div class="space-logo-big1">
+                <div class="space-logo-glow"></div>
+            </div>
+        </div>
+    </section>
+
+       <!-- SECCION JUGADORES -->
+<section id="jugadores">
+    <h2 class="section-title">Nuestros jugadores</h2>
+    <p class="section-subtitle">Rosters por equipo</p>
+
+    <!-- TITULO EQUIPO PRINCIPAL -->
+    <div class="players-team-heading players-team-heading--team1">
+        <span class="players-team-kicker">Equipo principal</span>
+        <h3 class="players-team-title">Code Genius · CG1</h3>
+    </div>
+
+    <!-- CARRUSEL EQUIPO PRINCIPAL (CG1 / roster principal) -->
+    <div class="player-carousel player-carousel--team1">
+        <button class="carousel-arrow prev" aria-label="Jugador anterior">‹</button>
+
+        <div class="player-track">
+            <!-- CEO Sipgb -->
+            <article class="player-card active" data-index="0">
+                <div class="player-portrait">
+                    <div class="portrait-circle">
+                        <img src="img/sipgb.png" alt="Sipgb">
+                    </div>
+                </div>
+                <div class="player-info">
+                    <h3 class="player-name">Sipgb</h3>
+                    <p class="player-role">CEO</p>
+                    <p class="player-bio">
+                        Lorem ipsum dolor sit amet consectetur adipiscing
+                        elit cubilia erat eleifend, pretium hac penatibus accumsan praesen
+                    </p>
+                    <div class="player-tags">
+                        <span class="player-tag">CEO</span>
+                        <span class="player-tag">Coaching</span>
+                        <span class="player-tag">Organizador</span>
+                    </div>
+                </div>
+            </article>
+
+            <!-- CAPITAN Seral -->
+            <article class="player-card" data-index="1">
+                <div class="player-portrait">
+                    <div class="portrait-circle">
+                        <img src="img/seral.png" alt="Seral">
+                    </div>
+                </div>
+                <div class="player-info">
+                    <h3 class="player-name">Seral</h3>
+                    <p class="player-role">Capitán CG1</p>
+                    <p class="player-bio">
+                        Lorem ipsum dolor sit amet consectetur adipiscing
+                        elit cubilia erat eleifend, pretium hac penatibus accumsan praesen
+                    </p>
+                    <div class="player-tags">
+                        <span class="player-tag">Capitán</span>
+                        <span class="player-tag">X</span>
+                        <span class="player-tag">X</span>
+                    </div>
+                </div>
+            </article>
+
+            <!-- CAPITAN Graco -->
+            <article class="player-card" data-index="2">
+                <div class="player-portrait">
+                    <div class="portrait-circle">
+                        <img src="img/graco.png" alt="graco">
+                    </div>
+                </div>
+                <div class="player-info">
+                    <h3 class="player-name">elgraco</h3>
+                    <p class="player-role">Capitán CG2</p>
+                    <p class="player-bio">
+                        Lorem ipsum dolor sit amet consectetur adipiscing
+                        elit cubilia erat eleifend, pretium hac penatibus accumsan praesen
+                    </p>
+                    <div class="player-tags">
+                        <span class="player-tag">Capitán</span>
+                        <span class="player-tag">X</span>
+                        <span class="player-tag">X</span>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Player Onix -->
+            <article class="player-card" data-index="3">
+                <div class="player-portrait">
+                    <div class="portrait-circle">
+                        <img src="img/onix.png" alt="Onix">
+                    </div>
+                </div>
+                <div class="player-info">
+                    <h3 class="player-name">iLyOniiX</h3>
+                    <p class="player-role">Jugador CG</p>
+                    <p class="player-bio">
+                        Lorem ipsum dolor sit amet consectetur adipiscing
+                        elit cubilia erat eleifend, pretium hac penatibus accumsan praesen
+                    </p>
+                    <div class="player-tags">
+                        <span class="player-tag">X</span>
+                        <span class="player-tag">X</span>
+                        <span class="player-tag">X</span>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <button class="carousel-arrow next" aria-label="Jugador siguiente">›</button>
+    </div>
+
+    <div class="carousel-dots carousel-dots-team1">
+        <button class="dot active" data-index="0" aria-label="Jugador 1"></button>
+        <button class="dot" data-index="1" aria-label="Jugador 2"></button>
+        <button class="dot" data-index="2" aria-label="Jugador 3"></button>
+        <button class="dot" data-index="3" aria-label="Jugador 4"></button>
+    </div>
+
+
+    <!-- TITULO EQUIPO SECUNDARIO -->
+    <div class="players-team-heading players-team-heading--team2">
+        <span class="players-team-kicker">Equipo secundario</span>
+        <h3 class="players-team-title">Code Genesis · CG2</h3>
+    </div>
+
+    <!-- CARRUSEL EQUIPO SECUNDARIO (CG2 / Code Genesis) -->
+    <div class="player-carousel player-carousel--team2">
+        <button class="carousel-arrow prev" aria-label="Jugador anterior">‹</button>
+
+        <div class="player-track">
+            <!-- Player Vick -->
+            <article class="player-card active" data-index="0">
+                <div class="player-portrait">
+                    <div class="portrait-circle">
+                        <img src="img/vick.png" alt="Vick">
+                    </div>
+                </div>
+                <div class="player-info">
+                    <h3 class="player-name">Vick6804</h3>
+                    <p class="player-role">Jugador CG2</p>
+                    <p class="player-bio">
+                        Lorem ipsum dolor sit amet consectetur adipiscing
+                        elit cubilia erat eleifend, pretium hac penatibus accumsan praesen
+                    </p>
+                    <div class="player-tags">
+                        <span class="player-tag">X</span>
+                        <span class="player-tag">X</span>
+                        <span class="player-tag">X</span>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Player Yiyo -->
+            <article class="player-card" data-index="1">
+                <div class="player-portrait">
+                    <div class="portrait-circle">
+                        <img src="img/yiyo.png" alt="Yiyo">
+                    </div>
+                </div>
+                <div class="player-info">
+                    <h3 class="player-name">Yiyo</h3>
+                    <p class="player-role">Jugador CG2</p>
+                    <p class="player-bio">
+                        Lorem ipsum dolor sit amet consectetur adipiscing
+                        elit cubilia erat eleifend, pretium hac penatibus accumsan praesen
+                    </p>
+                    <div class="player-tags">
+                        <span class="player-tag">X</span>
+                        <span class="player-tag">X</span>
+                        <span class="player-tag">X</span>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Player Yegu07 -->
+            <article class="player-card" data-index="2">
+                <div class="player-portrait">
+                    <div class="portrait-circle">
+                        <img src="img/yegu.gif" alt="Yegu07">
+                    </div>
+                </div>
+                <div class="player-info">
+                    <h3 class="player-name">Yegu07</h3>
+                    <p class="player-role">Jugador CG2</p>
+                    <p class="player-bio">
+                        Lorem ipsum dolor sit amet consectetur adipiscing
+                        elit cubilia erat eleifend, pretium hac penatibus accumsan praesen
+                    </p>
+                    <div class="player-tags">
+                        <span class="player-tag">X</span>
+                        <span class="player-tag">X</span>
+                        <span class="player-tag">X</span>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Player Mauri -->
+            <article class="player-card" data-index="3">
+                <div class="player-portrait">
+                    <div class="portrait-circle">
+                        <img src="img/mauri.png" alt="Mauri">
+                    </div>
+                </div>
+                <div class="player-info">
+                    <h3 class="player-name">Mauri</h3>
+                    <p class="player-role">Jugador CG2</p>
+                    <p class="player-bio">
+                        Lorem ipsum dolor sit amet consectetur adipiscing
+                        elit cubilia erat eleifend, pretium hac penatibus accumsan praesen
+                    </p>
+                    <div class="player-tags">
+                        <span class="player-tag">X</span>
+                        <span class="player-tag">X</span>
+                        <span class="player-tag">X</span>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <button class="carousel-arrow next" aria-label="Jugador siguiente">›</button>
+    </div>
+
+    <div class="carousel-dots carousel-dots-team2">
+        <button class="dot active" data-index="0" aria-label="Jugador 1"></button>
+        <button class="dot" data-index="1" aria-label="Jugador 2"></button>
+        <button class="dot" data-index="2" aria-label="Jugador 3"></button>
+        <button class="dot" data-index="3" aria-label="Jugador 4"></button>
+    </div>
+</section>
+
+
+
+
+    <!-- FOOTER -->
+    <footer>
+        © <span id="year"></span> Code Genius eSports · Mario Kart Club
+    </footer>
+
+    <script>
+        // Año footer
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Carrusel de jugadores
+        function setupPlayerCarousel(carouselSelector, dotsSelector) {
+            const carousel = document.querySelector(carouselSelector);
+            const dotsContainer = document.querySelector(dotsSelector);
+
+            if (!carousel || !dotsContainer) return;
+
+            const track = carousel.querySelector('.player-track');
+            const cards = Array.from(carousel.querySelectorAll('.player-card'));
+            const prevBtn = carousel.querySelector('.carousel-arrow.prev');
+            const nextBtn = carousel.querySelector('.carousel-arrow.next');
+            const dots = Array.from(dotsContainer.querySelectorAll('.dot'));
+
+            if (!track || cards.length === 0 || !prevBtn || !nextBtn || dots.length === 0) return;
+
+            let currentIndex = 0;
+
+            function updateCarousel(index) {
+                track.style.transform = `translateX(-${index * 100}%)`;
+
+                cards.forEach((card, i) => {
+                    card.classList.toggle('active', i === index);
+                });
+
+                dots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === index);
+                });
+            }
+
+            updateCarousel(currentIndex);
+
+            prevBtn.addEventListener('click', () => {
+                currentIndex = (currentIndex - 1 + cards.length) % cards.length;
+                updateCarousel(currentIndex);
+            });
+
+            nextBtn.addEventListener('click', () => {
+                currentIndex = (currentIndex + 1) % cards.length;
+                updateCarousel(currentIndex);
+            });
+
+            dots.forEach((dot, idx) => {
+                dot.addEventListener('click', () => {
+                    currentIndex = idx;
+                    updateCarousel(currentIndex);
+                });
+            });
+        }
+
+        setupPlayerCarousel('.player-carousel--team1', '.carousel-dots-team1');
+        setupPlayerCarousel('.player-carousel--team2', '.carousel-dots-team2');
+
+
+        // PARALLAX DEL LOGO ESPACIAL
+        const spaceBanner = document.querySelector('.space-banner');
+        const spaceLogo = document.querySelector('.space-logo-big');
+
+        function updateSpaceParallax() {
+            if (!spaceBanner || !spaceLogo) return;
+
+            const rect = spaceBanner.getBoundingClientRect();
+            const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+
+            const sectionCenter = rect.top + rect.height / 2;
+            const fromCenter = sectionCenter - windowHeight / 2;
+
+            const parallaxOffset = fromCenter * -0.3;
+
+            spaceLogo.style.transform = `translateY(${parallaxOffset}px)`;
+        }
+
+        window.addEventListener('scroll', updateSpaceParallax);
+        window.addEventListener('load', updateSpaceParallax);
+
+        // iluminar tarjetas de calendario
+        const matchCards = document.querySelectorAll('.match-card');
+        const socialCards = document.querySelectorAll('.social-card');
+
+        function setupSelectableCards(cards) {
+    if (!cards || cards.length === 0) return;
+
+    cards.forEach(card => {
+        card.addEventListener('click', () => {
+            const wasSelected = card.classList.contains('is-selected');
+
+            cards.forEach(c => c.classList.remove('is-selected'));
+
+            if (!wasSelected) {
+                card.classList.add('is-selected');
+            }
+        });
+    });
+}
+
+
+        setupSelectableCards(matchCards);
+        setupSelectableCards(socialCards);
+
+    </script>
+
+</body>
+
+</html>

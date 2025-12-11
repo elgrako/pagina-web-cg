@@ -1,0 +1,105 @@
+/* ========= PARALLAX ========= */
+
+/* Bloque principal*/
+#inicio.parallax {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
+    background-color: #020514;     
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+
+    overflow: hidden;
+}
+
+#inicio.parallax::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 25% 0%, rgba(0, 90, 180, 0.35), transparent 60%),
+        linear-gradient(to bottom, rgba(0, 5, 25, 0.92), rgba(0, 5, 15, 0.96));
+    pointer-events: none;
+    z-index: 1;
+}
+
+#inicio.parallax::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url('img/cglogo.png') center/55% no-repeat;
+    opacity: 1;           
+    filter: blur(2px);
+    transform: translateY(10px) scale(1.1);
+    animation: heroLogoFloat 10s ease-in-out infinite alternate;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.parallax-content {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    padding: 5rem 1.5rem 3rem;
+}
+
+.tagline {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: #00c4d8;
+    margin-bottom: 0.75rem;
+}
+
+.hero-title {
+    font-size: clamp(2.4rem, 5vw, 3.6rem);
+    font-weight: 900;
+    text-transform: uppercase;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 22px rgba(0, 0, 0, 0.8);
+}
+
+.hero-title span {
+    color: #006fd1;
+}
+
+.hero-subtitle {
+    font-size: 1rem;
+    max-width: 540px;
+    margin: 0 auto 1.8rem;
+    color: #f5f5f5d5;
+}
+
+.hero-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 15%;
+}
+
+@keyframes heroLogoFloat {
+    0% {
+        transform: translateY(10px) scale(1.05);
+    }
+    100% {
+        transform: translateY(-8px) scale(1.07);
+    }
+}
+
+/* Responsive hero */
+@media (max-width: 780px) {
+    #inicio.parallax {
+        background-attachment: scroll;
+    }
+
+    .parallax-content {
+        padding-top: 5.5rem;
+    }
+}

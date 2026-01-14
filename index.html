@@ -358,31 +358,28 @@
         </div>
     </section>
 
-    <!-- SECCION EQUIPOS (3D + cards ocultos) -->
+    <!-- SECCION EQUIPOS -->
     <section id="equipos-3d">
         <div class="equipos3d-inner">
             <h2 class="section-title">Nuestros equipos</h2>
-            <p class="section-subtitle">Explora el modelo 3D y haz clic en los puntos brillantes</p>
+            <p class="section-subtitle">Mueve el ratón sobre el modelo y haz clic en los puntos brillantes</p>
 
-            <div class="sketchfab-wrap" id="sketchfab-container">
-                <!-- Loading overlay -->
-                <div class="loading-overlay" id="loading-overlay">
-                    <div class="loader"></div>
+            <div class="model-3d-container" id="model-container">
+                <!-- Imagen del modelo 3D -->
+                <div class="model-3d-wrapper" id="model-wrapper">
+                    <img src="img/modelo-3d.png" alt="Code Genius 3D Model" class="model-3d-image" id="model-image">
+
+                    <!-- Hotspots dinamicos -->
+                    <div class="hotspot hotspot-cg" id="hotspot-cg" data-team="cg">
+                        <span class="hotspot-label">Code Genius</span>
+                    </div>
+                    <div class="hotspot hotspot-cgen" id="hotspot-cgen" data-team="cgen">
+                        <span class="hotspot-label">Code Genesis</span>
+                    </div>
                 </div>
-
-                <iframe id="sketchfab-iframe"
-                    src="https://sketchfab.com/models/dd8581835a0c4614b37cd508546daae3/embed?autostart=1&ui_controls=1&ui_infos=0&ui_stop=0&ui_watermark=0&ui_hint=0&preload=1&transparent=0&orbit_constraint_zoom_in=0&orbit_constraint_zoom_out=0&ui_theme=dark&ui_settings=0&ui_annotations=0&ui_help=0&ui_vr=0&ui_fullscreen=0&ui_inspector=0"
-                    title="Code Genius 3D" allow="autoplay; fullscreen; xr-spatial-tracking; accelerometer; gyroscope"
-                    allowfullscreen frameborder="0"
-                    sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-popups-to-escape-sandbox">
-                </iframe>
-
-                <!-- Hotspots dinámicos -->
-                <div class="hotspot hotspot-cg" id="hotspot-cg" data-team="cg"></div>
-                <div class="hotspot hotspot-cgen" id="hotspot-cgen" data-team="cgen"></div>
             </div>
 
-            <!-- Cards (ocultos hasta click) -->
+            <!-- Cards -->
             <div class="teams-reveal">
                 <div class="team-card team-card--cg" id="team-card-cg">
                     <div class="team-name">Code Genius</div>
@@ -424,12 +421,11 @@
     <!-- SECCION JUGADORES -->
     <section id="jugadores">
         <h2 class="section-title">Nuestros jugadores</h2>
-        <p class="section-subtitle">Rosters por equipo</p>
+        <p class="section-subtitle">Rosters por equipos</p>
 
         <!-- TITULO EQUIPO PRINCIPAL -->
         <div class="players-team-heading players-team-heading--team1">
-            <span class="players-team-kicker">Equipo principal</span>
-            <h3 class="players-team-title">Code Genius</h3>
+            <h3 class="players-team-kicker">Code Genius</h3>
         </div>
 
         <!-- CARRUSEL EQUIPO PRINCIPAL -->
@@ -689,8 +685,7 @@
 
         <!-- TITULO EQUIPO SECUNDARIO -->
         <div class="players-team-heading players-team-heading--team2">
-            <span class="players-team-kicker">Equipo secundario</span>
-            <h3 class="players-team-title">Code Genesis</h3>
+            <h3 class="players-team-kicker">Code Genesis</h3>
         </div>
 
         <!-- CARRUSEL EQUIPO SECUNDARIO (CG2 / Code Genesis) -->
@@ -1151,164 +1146,44 @@
         setupSelectableCards(socialCards);
     </script>
 
-    <script src="https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js"></script>
-    <!-- SCRIPT DE TRACKING 3D -->
     <script>
-        // Configuración de posiciones 3D para cada hotspot
-        const hotspotConfig = {
-            cg: {
-                position: [-2, 1.5, 0],
-                fallback: { x: 36, y: 42 }
-            },
-            cgen: {
-                position: [2, 1, 0],
-                fallback: { x: 62, y: 58 }
-            }
-        };
-
-        let api;
-        let isApiReady = false;
-        let fallbackActivated = false;
-
-        // Detectar si es Firefox
-        const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
-
-        if (isFirefox) {
-            console.log('🦊 Firefox detectado - usando modo de compatibilidad');
-        }
-
-        // Función para inicializar
-        function initSketchfab() {
-            const iframe = document.getElementById('sketchfab-iframe');
-
-            // Verificar que el iframe existe
-            if (!iframe) {
-                console.error('❌ Iframe no encontrado');
-                activateFallback();
-                return;
-            }
-
-            // Verificar que Sketchfab API está disponible
-            if (typeof window.Sketchfab === 'undefined') {
-                console.error('❌ Sketchfab API no cargada');
-                activateFallback();
-                return;
-            }
-
-            const client = new window.Sketchfab('1.12.1', iframe);
-
-            client.init('', {
-                success: function (apiInstance) {
-                    api = apiInstance;
-                    api.start(() => {
-                        api.addEventListener('viewerready', () => {
-                            console.log('✅ Sketchfab API lista');
-                            isApiReady = true;
-                            hideLoading();
-
-                            if (!isFirefox) {
-                                startHotspotTracking();
-                                api.addEventListener('camerastart', updateHotspots);
-                                api.addEventListener('camerastop', updateHotspots);
-                            } else {
-                                // En Firefox, actualizar cada 100ms
-                                setInterval(updateHotspots, 100);
-                            }
-                        });
-                    });
-                },
-                error: function (err) {
-                    console.warn('⚠️ Error al iniciar API:', err);
-                    activateFallback();
-                },
-                autostart: 1,
-                preload: 1
-            });
-        }
-
-        // Ocultar loading
-        function hideLoading() {
-            const loadingEl = document.getElementById('loading-overlay');
-            if (loadingEl) {
-                loadingEl.classList.add('hidden');
-            }
-        }
-
-        // Activar modo fallback
-        function activateFallback() {
-            if (fallbackActivated) return;
-            fallbackActivated = true;
-
-            console.log('📍 Activando posiciones estáticas');
-            hideLoading();
-            useFallbackPositions();
-        }
-
-        // Actualizar posiciones de hotspots
-        function updateHotspots() {
-            if (!isApiReady || !api) return;
-
-            Object.keys(hotspotConfig).forEach(key => {
-                const config = hotspotConfig[key];
-                const hotspot = document.getElementById(`hotspot-${key}`);
-
-                if (!hotspot) return;
-
-                try {
-                    api.getWorldToScreenCoordinates(config.position, (err, screen) => {
-                        if (!err && screen) {
-                            const container = document.getElementById('sketchfab-container');
-                            const rect = container.getBoundingClientRect();
-
-                            const x = (screen[0] / rect.width) * 100;
-                            const y = (screen[1] / rect.height) * 100;
-
-                            if (x >= 0 && x <= 100 && y >= 0 && y <= 100) {
-                                hotspot.style.left = `${x}%`;
-                                hotspot.style.top = `${y}%`;
-                                hotspot.style.transform = 'translate(-50%, -50%)';
-                                hotspot.style.opacity = '1';
-                            } else {
-                                hotspot.style.opacity = '0.3';
-                            }
-                        }
-                    });
-                } catch (e) {
-                    console.warn('Error actualizando hotspot:', e);
-                }
-            });
-        }
-
-        // Tracking continuo
-        function startHotspotTracking() {
-            function animate() {
-                if (isApiReady) {
-                    updateHotspots();
-                }
-                requestAnimationFrame(animate);
-            }
-            animate();
-        }
-
-        // Posiciones estáticas de fallback
-        function useFallbackPositions() {
-            Object.keys(hotspotConfig).forEach(key => {
-                const hotspot = document.getElementById(`hotspot-${key}`);
-                if (!hotspot) return;
-
-                const fallback = hotspotConfig[key].fallback;
-                hotspot.style.left = `${fallback.x}%`;
-                hotspot.style.top = `${fallback.y}%`;
-                hotspot.style.transform = 'translate(-50%, -50%)';
-                hotspot.style.opacity = '1';
-            });
-        }
-
-        // Click handlers
+        // Efecto parallax
         document.addEventListener('DOMContentLoaded', function () {
-            // Configurar clicks de hotspots
+            const container = document.getElementById('model-container');
+            const wrapper = document.getElementById('model-wrapper');
+            const image = document.getElementById('model-image');
+
+            if (!container || !wrapper || !image) return;
+
+            container.addEventListener('mousemove', function (e) {
+                const rect = container.getBoundingClientRect();
+                const x = (e.clientX - rect.left) / rect.width;
+                const y = (e.clientY - rect.top) / rect.height;
+
+                const rotateY = (x - 0.5) * 15;
+                const rotateX = (y - 0.5) * -15;
+
+                wrapper.style.transform = `
+            rotateX(${rotateX}deg) 
+            rotateY(${rotateY}deg)
+            scale(1.05)
+        `;
+
+                const moveX = (x - 0.5) * 20;
+                const moveY = (y - 0.5) * 20;
+                image.style.transform = `translate(${moveX}px, ${moveY}px)`;
+            });
+
+            // Reset 
+            container.addEventListener('mouseleave', function () {
+                wrapper.style.transform = 'rotateX(0deg) rotateY(0deg) scale(1)';
+                image.style.transform = 'translate(0, 0)';
+            });
+
             document.querySelectorAll('.hotspot').forEach(hotspot => {
-                hotspot.addEventListener('click', function () {
+                hotspot.addEventListener('click', function (e) {
+                    e.stopPropagation();
+
                     const team = this.dataset.team;
                     const card = document.getElementById(`team-card-${team}`);
 
@@ -1324,49 +1199,56 @@
                         setTimeout(() => {
                             card.classList.add('is-visible');
                             card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                        }, 50);
+                        }, 100);
                     }
                 });
             });
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const hotspots = document.querySelectorAll(".hotspot");
+            const cards = document.querySelectorAll(".team-card");
 
-            // Iniciar después de que todo cargue
-            setTimeout(() => {
-                if (typeof window.Sketchfab !== 'undefined') {
-                    initSketchfab();
-                } else {
-                    console.warn('⚠️ Sketchfab API no disponible');
-                    activateFallback();
-                }
-            }, 500);
+            hotspots.forEach(hotspot => {
+                hotspot.addEventListener("click", () => {
+                    const team = hotspot.dataset.team;
+
+                    cards.forEach(card => {
+                        card.classList.remove("is-visible");
+                    });
+
+                    const target = document.getElementById(`team-card-${team}`);
+                    if (target) {
+                        target.classList.add("is-visible");
+                    }
+                });
+            });
+        });
+    </script>
+
+    <script>
+        const container = document.querySelector(".model-3d-container");
+        const wrapper = document.querySelector(".model-3d-wrapper");
+
+        container.addEventListener("mousemove", (e) => {
+            const rect = container.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const rotateY = ((x / rect.width) - 0.5) * 12;
+            const rotateX = ((y / rect.height) - 0.5) * -12;
+
+            wrapper.style.transform = `
+        rotateX(${rotateX}deg)
+        rotateY(${rotateY}deg) `;
         });
 
-        // Timeout de seguridad
-        setTimeout(() => {
-            if (!isApiReady && !fallbackActivated) {
-                console.log('⏱️ Timeout: Activando fallback');
-                activateFallback();
-            }
-        }, 8000);
-
-        // Verificar iframe cada 2 segundos
-        const iframeCheck = setInterval(() => {
-            const iframe = document.getElementById('sketchfab-iframe');
-            if (iframe) {
-                try {
-                    // Intentar acceder al contentWindow
-                    if (iframe.contentWindow) {
-                        console.log('✅ Iframe accesible');
-                    }
-                } catch (e) {
-                    console.warn('⚠️ Iframe bloqueado:', e.message);
-                    if (!fallbackActivated) {
-                        activateFallback();
-                    }
-                }
-                clearInterval(iframeCheck);
-            }
-        }, 2000);
+        container.addEventListener("mouseleave", () => {
+            wrapper.style.transform = "rotateX(0deg) rotateY(0deg)";
+        });
     </script>
+
 
 </body>
 

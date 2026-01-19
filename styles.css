@@ -322,13 +322,14 @@ nav a:hover {
 }
 
 .section-title {
-    font-size: 1.8rem;
-    margin-bottom: 0.5rem;
+    color: #cccccc;
+    font-size: 2rem;
+    margin-bottom: 3rem;
 }
 
 .section-subtitle {
     color: #cccccc;
-    font-size: 0.9rem;
+    font-size: 0.5rem;
     text-transform: uppercase;
     letter-spacing: 0.22em;
     margin-bottom: 2rem;
@@ -837,7 +838,37 @@ nav a:hover {
     }
 }
 
+/* --- SWIPER CALENDARIO --- */
+.calendar-swiper {
+    width: 100%;
+    padding: 20px 10px 50px 10px; 
+    overflow: hidden; 
+}
 
+.swiper-slide {
+    height: auto;
+    display: flex;
+    justify-content: center;
+}
+
+.match-card {
+    width: 100%;
+    max-width: 380px; 
+}
+
+.swiper-button-next, .swiper-button-prev {
+    color: #0074c4;
+    text-shadow: 0 0 10px rgba(0, 116, 196, 0.8);
+}
+
+.swiper-pagination-bullet {
+    background: #fff;
+    opacity: 0.4;
+}
+.swiper-pagination-bullet-active {
+    background: #0074c4;
+    box-shadow: 0 0 10px #0074c4;
+}
 
 /* ----------------- CALENDARIO SOCIAL ----------------- */
 
@@ -1245,9 +1276,9 @@ nav a:hover {
     font-size: clamp(2rem, 4vw, 2.8rem);
     font-weight: 700;
     letter-spacing: 0.04em;
-    margin-bottom: 0.6rem;
+    margin-bottom: 1rem;
 
-    background: linear-gradient(90deg, #bfe9ff, #4fc3ff, #bfe9ff);
+    background: linear-gradient(90deg, #bfe9ff, #075ee0, #82d3ff);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -1258,9 +1289,9 @@ nav a:hover {
 #equipos-3d .section-subtitle {
     text-align: center;
     max-width: 600px;
-    margin: 0 auto 2.5rem;
-    font-size: 0.95rem;
-    color: rgba(200, 230, 255, 0.75);
+    margin: 0 auto 2rem;
+    font-size: 0.6rem;
+    color: rgba(57, 166, 255, 0.75);
     letter-spacing: 0.02em;
 }
 
@@ -1275,15 +1306,68 @@ nav a:hover {
 }
 
 .team-card {
-    display: none;
+    position: absolute;
+    width: min(520px, 90vw);
+    padding: 2.4rem 2.6rem;
+
+    border-radius: 26px;
+    box-shadow:
+        0 30px 80px rgba(0, 0, 0, 0.85),
+        inset 0 0 60px rgba(255, 255, 255, 0.03);
+
     opacity: 0;
-    transform: translateY(25px) scale(0.97);
+    pointer-events: none;
+
+    transform:
+        translate(-50%, -40%)
+        scale(0.88);
+
+    transition:
+        opacity 0.45s ease,
+        transform 0.55s cubic-bezier(.2,.8,.2,1);
 }
 
-.team-card.is-visible {
-    display: block;
-    animation: revealTeam 0.55s ease forwards;
+.team-card--cg {
+    background: linear-gradient(160deg, #081a2f, #020812);
+    border: 1px solid rgba(90, 180, 255, 0.35);
 }
+.team-card--cgen {
+    background: linear-gradient(160deg, #1a0b2e, #07010f);
+    border: 1px solid rgba(170, 110, 255, 0.35);
+}
+
+
+.teams-reveal {
+    position: absolute;
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 20;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    pointer-events: none;
+}
+
+
+.team-card.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform:
+        translate(-65%, -80%)
+        scale(1);
+}
+
+.team-card--cgen.is-visible {
+    transform:
+        translate(22vw, -55%)
+        scale(1);
+}
+
+
+
 
 @keyframes revealTeam {
     to {
@@ -1314,10 +1398,12 @@ nav a:hover {
 }
 
 .team-name {
-    font-size: 1.3rem;
-    font-weight: 700;
-    margin-bottom: 0.75rem;
+    font-size: 1.55rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    margin-bottom: 1rem;
 }
+
 
 .team-meta {
     font-size: 0.9rem;
@@ -1410,7 +1496,7 @@ nav a:hover {
     font-size: 1rem;
     text-transform: uppercase;
     letter-spacing: 0.16em;
-    color: #1985d8;
+    color: #1880cf;
     margin-bottom: 0.25rem;
 }
 
@@ -1883,9 +1969,7 @@ footer a {
 }
 
 
-/* =========================
-   EQUIPOS 3D
-========================= */
+/* -----------------  EQUIPOS 3D -----------------  */
 .model-3d-container {
     position: relative;
     width: 100%;
@@ -1925,19 +2009,14 @@ footer a {
 
 .hotspot {
     position: absolute;
-    width: 14px;
-    height: 14px;
+    width: 9px;
+    height: 9px;
     border-radius: 50%;
     border: none;
     cursor: pointer;
     z-index: 10;
     transform-style: preserve-3d;
     backface-visibility: hidden;
-
-    background: radial-gradient(circle, #e6f6ff 20%, #5cc6ff 55%, transparent 70%);
-    box-shadow:
-        0 0 6px rgba(120, 200, 255, 0.9),
-        0 0 14px rgba(0, 140, 255, 0.6);
 
     transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
@@ -1950,33 +2029,7 @@ footer a {
 }
 
 .hotspot:hover {
-    transform: scale(1.6);
-    box-shadow:
-        0 0 10px rgba(150, 220, 255, 1),
-        0 0 22px rgba(0, 160, 255, 0.9);
-}
-
-.hotspot-label {
-    position: absolute;
-    top: 130%;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 0.7rem;
-    padding: 0.35rem 0.6rem;
-    border-radius: 6px;
-
-    background: rgba(5, 8, 18, 0.95);
-    color: #fff;
-    border: 1px solid rgba(120, 200, 255, 0.4);
-
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s ease, top 0.25s ease;
-}
-
-.hotspot:hover .hotspot-label {
-    opacity: 1;
-    top: 150%;
+    transform: scale(1.8);
 }
 
 
@@ -2006,16 +2059,30 @@ footer a {
     }
 }
 
-/* Posiciones de hotspots - AJUSTA SEGÚN TU IMAGEN */
+/* Posiciones de hotspots */
 .hotspot-cg {
-    top: 25%;
-    left: 43%;
+    top: 24.6%;
+    left: 43.3%;
+    background: radial-gradient(circle, #e6f6ff 30%, #4fbaff 65%, transparent 75%);
+    box-shadow:
+        0 0 6px rgba(90, 180, 255, 0.9),
+        0 0 14px rgba(0, 120, 255, 0.6);
 }
 
 .hotspot-cgen {
-    top: 44%;
-    left: 63%;
+    top: 44.5%;
+    left: 62.7%;
+    background: radial-gradient(circle, #f1e6ff 30%, #a56bff 65%, transparent 75%);
+    box-shadow:
+        0 0 6px rgba(180, 120, 255, 0.9),
+        0 0 14px rgba(120, 0, 255, 0.6);
 }
+.hotspot-cgen:hover {
+    box-shadow:
+        0 0 10px rgba(200, 150, 255, 1),
+        0 0 22px rgba(160, 80, 255, 1);
+}
+
 
 #equipos-3d {
     position: relative;

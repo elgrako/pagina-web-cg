@@ -8,6 +8,7 @@
 
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="parallax.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 </head>
 
 <body>
@@ -180,69 +181,21 @@
     </section>
 
 
-    <!-- SECCION CALENDARIO -->
-    <section id="calendario">
-        <div class="section calendario-inner">
-            <h2 class="section-title">Calendario de partidos</h2>
-            <p class="section-subtitle">Ultimos enfrentamientos</p>
+ <section id="calendario">
+    <div class="section calendario-inner">
+        <h2 class="section-title">Calendario de partidos</h2>
+        <p class="section-subtitle">Últimos enfrentamientos</p>
 
-            <div class="calendar-grid">
-
-                <!-- Derrota -->
-                <article class="match-card status-lost">
-                    <h3 class="match-title">Code Genesis vs Yoshi Family</h3>
-
-                    <div class="match-date">
-                        <span class="day">16</span>
-                        <span class="month">DEC</span>
-                        <span class="time">22:00</span>
-                    </div>
-
-                    <p class="match-outcome match-outcome--loss">
-                        Derrota
-                    </p>
-
-                    <p class="match-meta">508 - 476</p>
-                </article>
-
-                <!-- Victoria -->
-                <article class="match-card status-winned">
-                    <h3 class="match-title">Code Genius vs Champi-Brothers</h3>
-
-                    <div class="match-date">
-                        <span class="day">17</span>
-                        <span class="month">DEC</span>
-                        <span class="time">22:00</span>
-                    </div>
-
-                    <p class="match-outcome match-outcome--win">
-                        Victoria
-                    </p>
-
-                    <p class="match-meta">526 - 458</p>
-                </article>
-
-                <!-- Victoria -->
-                <article class="match-card status-winned">
-                    <h3 class="match-title">Code Genesis vs Epines Volantes</h3>
-
-                    <div class="match-date">
-                        <span class="day">18</span>
-                        <span class="month">DEC</span>
-                        <span class="time">21:00</span>
-                    </div>
-
-                    <p class="match-outcome match-outcome--win">
-                        Victoria
-                    </p>
-
-                    <p class="match-meta">504 - 480</p>
-                </article>
-
-
-            </div>
+        <div class="swiper calendar-swiper">
+            <div class="swiper-wrapper" id="matches-container">
+                </div>
+            
+            <div class="swiper-pagination"></div>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-button-next"></div>
         </div>
-    </section>
+    </div>
+</section>
 
 
 
@@ -361,20 +314,18 @@
     <!-- SECCION EQUIPOS -->
     <section id="equipos-3d">
         <div class="equipos3d-inner">
-            <h2 class="section-title">Nuestros equipos</h2>
-            <p class="section-subtitle">Mueve el ratón sobre el modelo y haz clic en los puntos brillantes</p>
+            <h2 class="section-title">NUESTROS EQUIPOS</h2>
+            <p class="section-subtitle">haz clic en los puntos brillantes</p>
 
             <div class="model-3d-container" id="model-container">
-                <!-- Imagen del modelo 3D -->
                 <div class="model-3d-wrapper" id="model-wrapper">
                     <img src="img/modelo-3d.png" alt="Code Genius 3D Model" class="model-3d-image" id="model-image">
 
-                    <!-- Hotspots dinamicos -->
+                    <!-- Hotspots -->
                     <div class="hotspot hotspot-cg" id="hotspot-cg" data-team="cg">
-                        <span class="hotspot-label">Code Genius</span>
                     </div>
                     <div class="hotspot hotspot-cgen" id="hotspot-cgen" data-team="cgen">
-                        <span class="hotspot-label">Code Genesis</span>
+
                     </div>
                 </div>
             </div>
@@ -1147,65 +1098,6 @@
     </script>
 
     <script>
-        // Efecto parallax
-        document.addEventListener('DOMContentLoaded', function () {
-            const container = document.getElementById('model-container');
-            const wrapper = document.getElementById('model-wrapper');
-            const image = document.getElementById('model-image');
-
-            if (!container || !wrapper || !image) return;
-
-            container.addEventListener('mousemove', function (e) {
-                const rect = container.getBoundingClientRect();
-                const x = (e.clientX - rect.left) / rect.width;
-                const y = (e.clientY - rect.top) / rect.height;
-
-                const rotateY = (x - 0.5) * 15;
-                const rotateX = (y - 0.5) * -15;
-
-                wrapper.style.transform = `
-            rotateX(${rotateX}deg) 
-            rotateY(${rotateY}deg)
-            scale(1.05)
-        `;
-
-                const moveX = (x - 0.5) * 20;
-                const moveY = (y - 0.5) * 20;
-                image.style.transform = `translate(${moveX}px, ${moveY}px)`;
-            });
-
-            // Reset 
-            container.addEventListener('mouseleave', function () {
-                wrapper.style.transform = 'rotateX(0deg) rotateY(0deg) scale(1)';
-                image.style.transform = 'translate(0, 0)';
-            });
-
-            document.querySelectorAll('.hotspot').forEach(hotspot => {
-                hotspot.addEventListener('click', function (e) {
-                    e.stopPropagation();
-
-                    const team = this.dataset.team;
-                    const card = document.getElementById(`team-card-${team}`);
-
-                    if (!card) return;
-
-                    if (card.classList.contains('is-visible')) {
-                        card.classList.remove('is-visible');
-                    } else {
-                        document.querySelectorAll('.team-card').forEach(c => {
-                            c.classList.remove('is-visible');
-                        });
-
-                        setTimeout(() => {
-                            card.classList.add('is-visible');
-                            card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                        }, 100);
-                    }
-                });
-            });
-        });
-    </script>
-    <script>
         document.addEventListener("DOMContentLoaded", () => {
             const hotspots = document.querySelectorAll(".hotspot");
             const cards = document.querySelectorAll(".team-card");
@@ -1228,28 +1120,172 @@
     </script>
 
     <script>
-        const container = document.querySelector(".model-3d-container");
-        const wrapper = document.querySelector(".model-3d-wrapper");
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('model-container');
+            const wrapper = document.getElementById('model-wrapper');
 
-        container.addEventListener("mousemove", (e) => {
-            const rect = container.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
+            if (!container || !wrapper) return;
 
-            const rotateY = ((x / rect.width) - 0.5) * 12;
-            const rotateX = ((y / rect.height) - 0.5) * -12;
+            container.addEventListener('mousemove', (e) => {
+                const rect = container.getBoundingClientRect();
+                const x = (e.clientX - rect.left) / rect.width - 0.5;
+                const y = (e.clientY - rect.top) / rect.height - 0.5;
 
-            wrapper.style.transform = `
-        rotateX(${rotateX}deg)
-        rotateY(${rotateY}deg) `;
-        });
+                const rotateX = y * -14;
+                const rotateY = x * 14;
+                const moveX = x * 18;
+                const moveY = y * 18;
 
-        container.addEventListener("mouseleave", () => {
-            wrapper.style.transform = "rotateX(0deg) rotateY(0deg)";
+                wrapper.style.transform = `
+            translate(${moveX}px, ${moveY}px)
+            rotateX(${rotateX}deg)
+            rotateY(${rotateY}deg)
+            scale(1.05)
+        `;
+            });
+
+            container.addEventListener('mouseleave', () => {
+                wrapper.style.transform =
+                    'translate(0,0) rotateX(0deg) rotateY(0deg) scale(1)';
+            });
         });
     </script>
 
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+
+    const MATCHES_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQaWN5ccBvxvrpJpZEBRNjdM-VJEP9hiTWoqlANz_PtmwIj9JjCEisGUGBboEO4bqdbWgdRajWghXFg/pub?gid=0&single=true&output=csv';
+    
+    // Si usas la misma hoja pero otra pestaña, cambia el 'gid' del enlace de abajo
+    const SOCIAL_URL  = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQaWN5ccBvxvrpJpZEBRNjdM-VJEP9hiTWoqlANz_PtmwIj9JjCEisGUGBboEO4bqdbWgdRajWghXFg/pub?gid=123456789&single=true&output=csv'; 
+
+
+    // -----------------------------------------------------------
+    // 2. CARGAR PARTIDOS
+    // -----------------------------------------------------------
+    Papa.parse(MATCHES_URL, {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+            const container = document.getElementById('matches-container');
+            const matches = results.data;
+            
+            container.innerHTML = '';
+
+            matches.reverse().forEach(match => {
+                if(!match.rival) return;
+
+                let statusClass = 'status-upcoming'; 
+                let outcomeHTML = `<p class="match-outcome" style="background:#222; border-color:#444; color:#888">Pendiente</p>`;
+                let metaHTML = `<p class="match-meta">VS</p>`;
+
+                if (match.puntos_nosotros && match.puntos_rival) {
+                    const nosotros = parseInt(match.puntos_nosotros);
+                    const rival = parseInt(match.puntos_rival);
+                    metaHTML = `<p class="match-meta">${nosotros} - ${rival}</p>`;
+
+                    if (nosotros > rival) {
+                        statusClass = 'status-winned';
+                        outcomeHTML = `<p class="match-outcome match-outcome--win">Victoria</p>`;
+                    } else if (nosotros < rival) {
+                        statusClass = 'status-lost';
+                        outcomeHTML = `<p class="match-outcome match-outcome--loss">Derrota</p>`;
+                    } else {
+                        outcomeHTML = `<p class="match-outcome" style="border-color:#0074c4; color:#fff">Empate</p>`;
+                    }
+                }
+
+                const dateParts = match.fecha ? match.fecha.split(/[-/]/) : ['00','MES'];
+                const day = dateParts[0];
+                const month = dateParts[1]; 
+
+                const slide = document.createElement('div');
+                slide.classList.add('swiper-slide');
+                slide.innerHTML = `
+                    <article class="match-card ${statusClass}">
+                        <h3 class="match-title">${match.equipo || 'Code Genius'} vs ${match.rival}</h3>
+                        <div class="match-date">
+                            <span class="day">${day}</span>
+                            <span class="month">${month}</span>
+                            <span class="time">${match.hora || '22:00'}</span>
+                        </div>
+                        ${outcomeHTML}
+                        ${metaHTML}
+                    </article>
+                `;
+                container.appendChild(slide);
+            });
+
+            initCalendarSwiper();
+        },
+        error: function(err) {
+            console.error("Error cargando partidos. Revisa el enlace CSV:", err);
+        }
+    });
+
+    const socialContainer = document.querySelector('.social-calendar-grid');
+
+    if(socialContainer) {
+        Papa.parse(SOCIAL_URL, {
+            download: true,
+            header: true,
+            skipEmptyLines: true,
+            complete: function(results) {
+                if(results.data.length > 0 && results.data[0].titulo) {
+                     socialContainer.innerHTML = '';
+                     
+                     results.data.forEach(event => {
+                        if(!event.titulo) return;
+
+                        const dateParts = event.fecha ? event.fecha.split(/[-/]/) : ['00','MES'];
+                        
+                        const article = document.createElement('article');
+                        article.classList.add('social-card');
+                        article.innerHTML = `
+                            <h3 class="social-title">${event.titulo}</h3>
+                            <div class="social-date">
+                                <span class="day">${dateParts[0]}</span>
+                                <span class="month">${dateParts[1]}</span>
+                                <span class="time">${event.hora || ''}</span>
+                            </div>
+                            <p class="social-meta">
+                                ${event.descripcion || ''}
+                            </p>
+                        `;
+                        socialContainer.appendChild(article);
+                     });
+                }
+            }
+        });
+    }
+
+});
+
+function initCalendarSwiper() {
+    new Swiper(".calendar-swiper", {
+        slidesPerView: 1,
+        spaceBetween: 20,
+        grabCursor: true,
+        pagination: {
+            el: ".swiper-pagination",
+            clickable: true,
+        },
+        navigation: {
+            nextEl: ".swiper-button-next",
+            prevEl: ".swiper-button-prev",
+        },
+        breakpoints: {
+            600: { slidesPerView: 2 },
+            900: { slidesPerView: 3 }
+        }
+    });
+}
+</script>
 </body>
 
 </html>

@@ -323,13 +323,13 @@ nav a:hover {
 
 .section-title {
     color: #cccccc;
-    font-size: 2rem;
+    font-size: 2.1rem;
     margin-bottom: 3rem;
 }
 
 .section-subtitle {
-    color: #cccccc;
-    font-size: 0.5rem;
+    color: #3a7fce;
+    font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 0.22em;
     margin-bottom: 2rem;

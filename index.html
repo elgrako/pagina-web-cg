@@ -23,7 +23,9 @@
             <nav>
                 <ul>
                     <li><a href="#inicio">Inicio</a></li>
-                    <li><a href="#equipos">Equipo</a></li>
+                    <li><a href="#sobrecg">Sobre Nosotros</a></li>
+                    <li><a href="#calendario">Calendario</a></li>
+                    <li><a href="#equipos-3d">Equipo</a></li>
                     <li><a href="#jugadores">Jugadores</a></li>
                     <li><a href="https://discord.gg/f2f94avR9p">Unete</a></li>
                     <li><a href="#tutoriales" class="nav-tutoriales">Tutoriales</a></li>
@@ -201,25 +203,17 @@
 
     <!-- CALENDARIO SOCIAL -->
     <section id="calendario-social">
-        <div class="calendario-social-inner">
-            <h2 class="section-title">Calendario social</h2>
-            <p class="section-subtitle">Eventos del club</p>
+        <div class="section calendario-inner">
+            <h2 class="section-title">Calendario Social</h2>
+            <p class="section-subtitle">Últimos Eventos</p>
 
-            <div class="social-calendar-grid">
+            <div class="swiper calendar-swiper">
+                <div class="swiper-wrapper" id="matches-container">
+                </div>
 
-                <!-- Evento 1 -->
-                <article class="social-card">
-                    <h3 class="social-title">Apertura de CG</h3>
-                    <div class="social-date">
-                        <span class="day">19</span>
-                        <span class="month">DEC</span>
-                        <span class="time">17:00</span>
-                    </div>
-                    <p class="social-meta">
-                        Apertura e Inicio de Code Genius
-                    </p>
-                </article>
-
+                <div class="swiper-pagination"></div>
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-button-next"></div>
             </div>
         </div>
     </section>
@@ -1192,7 +1186,7 @@
                             } else if (nosotros < rival) {
                                 // Perdimos
                                 statusClass = 'status-lost';
-                                outcomeHTML = `<p class="match-outcome match-outcome--loss">Derrota</p>`;
+                                outcomeHTML = `<p class=" match-outcome--loss">Derrota</p>`;
                             } else {
                                 // Empate
                                 outcomeHTML = `<p class="match-outcome match-outcome--draw">Empate</p>`;
@@ -1302,6 +1296,17 @@
                 }
             });
         }
+        document.addEventListener("click", (e) => {
+            const card = e.target.closest(".match-card");
+            if (!card) return;
+
+            document
+                .querySelectorAll(".match-card.is-selected")
+                .forEach(c => c.classList.remove("is-selected"));
+
+            card.classList.add("is-selected");
+        });
+
     </script>
 </body>
 

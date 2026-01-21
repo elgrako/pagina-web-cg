@@ -202,21 +202,22 @@
 
 
     <!-- CALENDARIO SOCIAL -->
-    <section id="calendario-social">
-        <div class="section calendario-inner">
-            <h2 class="section-title">Calendario Social</h2>
-            <p class="section-subtitle">Últimos Eventos</p>
+<section id="calendario-social">
+    <div class="section calendario-inner">
+        <h2 class="section-title">Calendario Social</h2>
+        <p class="section-subtitle">Próximos Eventos</p>
 
-            <div class="swiper calendar-swiper">
-                <div class="swiper-wrapper" id="matches-container">
-                </div>
-
-                <div class="swiper-pagination"></div>
-                <div class="swiper-button-prev"></div>
-                <div class="swiper-button-next"></div>
+        <div class="swiper social-swiper">
+            <div class="swiper-wrapper" id="social-container">
+                <!-- Los eventos se cargan aquí -->
             </div>
+
+            <div class="swiper-pagination"></div>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-button-next"></div>
         </div>
-    </section>
+    </div>
+</section>
 
     <!-- BANNER CODE GENIUS -->
     <section class="cg-strip">
@@ -1148,166 +1149,196 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
-            const MATCHES_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQaWN5ccBvxvrpJpZEBRNjdM-VJEP9hiTWoqlANz_PtmwIj9JjCEisGUGBboEO4bqdbWgdRajWghXFg/pub?gid=0&single=true&output=csv';
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const MATCHES_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQaWN5ccBvxvrpJpZEBRNjdM-VJEP9hiTWoqlANz_PtmwIj9JjCEisGUGBboEO4bqdbWgdRajWghXFg/pub?gid=0&single=true&output=csv';
+    
+    const SOCIAL_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQaWN5ccBvxvrpJpZEBRNjdM-VJEP9hiTWoqlANz_PtmwIj9JjCEisGUGBboEO4bqdbWgdRajWghXFg/pub?gid=123456789&single=true&output=csv';
 
-            const SOCIAL_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQaWN5ccBvxvrpJpZEBRNjdM-VJEP9hiTWoqlANz_PtmwIj9JjCEisGUGBboEO4bqdbWgdRajWghXFg/pub?gid=123456789&single=true&output=csv';
+    // ----------- CARGAR PARTIDOS -----------
+    Papa.parse(MATCHES_URL, {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: function (results) {
+            const container = document.getElementById('matches-container');
+            if (!container) return;
 
-            // --- CALENDARIO ---
-            Papa.parse(MATCHES_URL, {
-                download: true,
-                header: true,
-                skipEmptyLines: true,
-                complete: function (results) {
-                    const container = document.getElementById('matches-container');
-                    const matches = results.data;
+            const matches = results.data;
+            container.innerHTML = '';
 
-                    container.innerHTML = '';
+            matches.reverse().forEach(match => {
+                if (!match.rival || match.rival.trim() === '') return;
 
-                    matches.reverse().forEach(match => {
-                        if (!match.rival) return;
+                let statusClass = 'status-upcoming';
+                let outcomeClass = 'match-outcome--draw';
+                let outcomeText = 'Pendiente';
+                let metaHTML = '';
 
-                        let statusClass = 'status-upcoming';
-                        let outcomeHTML = `<p class="match-outcome">Pendiente</p>`;
-                        let metaHTML = '';
+                const nosotros = match.puntos_nosotros ? parseInt(match.puntos_nosotros.trim()) : null;
+                const rival = match.puntos_rival ? parseInt(match.puntos_rival.trim()) : null;
 
-                        if (match.puntos_nosotros && match.puntos_rival && match.puntos_nosotros.trim() !== "" && match.puntos_rival.trim() !== "") {
-                            const nosotros = parseInt(match.puntos_nosotros);
-                            const rival = parseInt(match.puntos_rival);
+                if (nosotros !== null && rival !== null && !isNaN(nosotros) && !isNaN(rival)) {
+                    if (nosotros > rival) {
+                        statusClass = 'status-winned';
+                        outcomeClass = 'match-outcome--win';
+                        outcomeText = 'Victoria';
+                    } else if (nosotros < rival) {
+                        statusClass = 'status-lost';
+                        outcomeClass = 'match-outcome--loss';
+                        outcomeText = 'Derrota';
+                    } else {
+                        outcomeClass = 'match-outcome--draw';
+                        outcomeText = 'Empate';
+                    }
 
-                            metaHTML = `<p class="match-meta">${nosotros} - ${rival}</p>`;
-
-                            if (nosotros > rival) {
-                                // Ganamos
-                                statusClass = 'status-winned';
-                                outcomeHTML = `<p class="match-outcome match-outcome--win">Victoria</p>`;
-                            } else if (nosotros < rival) {
-                                // Perdimos
-                                statusClass = 'status-lost';
-                                outcomeHTML = `<p class=" match-outcome--loss">Derrota</p>`;
-                            } else {
-                                // Empate
-                                outcomeHTML = `<p class="match-outcome match-outcome--draw">Empate</p>`;
-                            }
-                        }
-
-                        const dateParts = match.fecha ? match.fecha.split(/[-/]/) : ['00', 'MES'];
-                        const day = dateParts[0] || '00';
-                        const month = dateParts[1] || 'MES';
-
-                        const slide = document.createElement('div');
-                        slide.classList.add('swiper-slide');
-                        slide.innerHTML = `
-                        <article class="match-card ${statusClass}">
-                            <h3 class="match-title">${match.equipo || 'Code Genius'} vs ${match.rival}</h3>
-                            <div class="match-date">
-                                <span class="day">${day}</span>
-                                <span class="month">${month}</span>
-                                <span class="time">${match.hora || '00:00'}</span>
-                            </div>
-                            ${outcomeHTML}
-                            ${metaHTML}
-                        </article>
-                    `;
-                        container.appendChild(slide);
-                    });
-
-                    initCalendarSwiper();
-                },
-                error: function (err) {
-                    console.error("Error cargando partidos:", err);
+                    metaHTML = `<p class="match-meta">${nosotros} - ${rival}</p>`;
                 }
+
+                const dateParts = match.fecha ? match.fecha.split(/[-/]/) : ['--', 'MES'];
+                const day = dateParts[0] || '--';
+                const month = dateParts[1] || 'MES';
+
+                const slide = document.createElement('div');
+                slide.classList.add('swiper-slide');
+                slide.innerHTML = `
+                    <article class="match-card ${statusClass}">
+                        <h3 class="match-title">${match.equipo || 'Code Genius'} vs ${match.rival}</h3>
+                        
+                        <div class="match-date">
+                            <span class="day">${day}</span>
+                            <span class="month">${month.toUpperCase()}</span>
+                            <span class="time">${match.hora || '--:--'}</span>
+                        </div>
+                        
+                        <p class="match-outcome ${outcomeClass}">
+                            ${outcomeText}
+                        </p>
+                        
+                        ${metaHTML}
+                    </article>
+                `;
+                container.appendChild(slide);
             });
 
-            // --- CALENDARIO SOCIAL ---
-            const socialContainer = document.querySelector('.social-calendar-grid');
-
-            if (socialContainer) {
-                Papa.parse(SOCIAL_URL, {
-                    download: true,
-                    header: true,
-                    skipEmptyLines: true,
-                    complete: function (results) {
-                        const events = results.data;
-
-                        if (events.length > 0) {
-                            socialContainer.innerHTML = '';
-                        }
-
-                        events.forEach(event => {
-                            if (!event.titulo) return;
-
-                            const dateParts = event.fecha ? event.fecha.split(/[-/]/) : ['00', 'MES'];
-                            const day = dateParts[0] || '00';
-                            const month = dateParts[1] || 'MES';
-
-                            const article = document.createElement('article');
-                            article.classList.add('social-card');
-
-                            article.addEventListener('click', () => {
-                                document.querySelectorAll('.social-card').forEach(c => c.classList.remove('is-selected'));
-                                article.classList.add('is-selected');
-                            });
-
-                            article.innerHTML = `
-                            <h3 class="social-title">${event.titulo}</h3>
-                            <div class="social-date">
-                                <span class="day">${day}</span>
-                                <span class="month">${month}</span>
-                                <span class="time">${event.hora || ''}</span>
-                            </div>
-                            <p class="social-meta">
-                                ${event.descripcion || ''}
-                            </p>
-                        `;
-                            socialContainer.appendChild(article);
-                        });
-                    },
-                    error: function (err) {
-                        console.error("Error cargando social:", err);
-                    }
-                });
-            }
-
-        });
-
-        function initCalendarSwiper() {
-            new Swiper(".calendar-swiper", {
-                slidesPerView: 1,
-                spaceBetween: 20,
-                grabCursor: true,
-                pagination: {
-                    el: ".swiper-pagination",
-                    clickable: true,
-                },
-                navigation: {
-                    nextEl: ".swiper-button-next",
-                    prevEl: ".swiper-button-prev",
-                },
-                breakpoints: {
-                    600: {
-                        slidesPerView: 2
-                    },
-                    900: {
-                        slidesPerView: 3
-                    }
-                }
-            });
+            initMatchesSwiper();
+        },
+        error: function (err) {
+            console.error(" Error cargando partidos:", err);
         }
-        document.addEventListener("click", (e) => {
-            const card = e.target.closest(".match-card");
-            if (!card) return;
+    });
 
-            document
-                .querySelectorAll(".match-card.is-selected")
-                .forEach(c => c.classList.remove("is-selected"));
+    // ----------- CALENDARIO SOCIAL -----------
+    Papa.parse(SOCIAL_URL, {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: function (results) {
+            const container = document.getElementById('social-container');
+            if (!container) return;
 
-            card.classList.add("is-selected");
+            const events = results.data;
+            container.innerHTML = '';
+
+            events.forEach(event => {
+                if (!event.titulo || event.titulo.trim() === '') return;
+                const dateParts = event.fecha ? event.fecha.split(/[-/]/) : ['--', 'MES'];
+                const day = dateParts[0] || '--';
+                const month = dateParts[1] || 'MES';
+
+                const slide = document.createElement('div');
+                slide.classList.add('swiper-slide');
+                slide.innerHTML = `
+                    <article class="social-card">
+                        <h3 class="social-title">${event.titulo}</h3>
+                        <div class="social-date">
+                            <span class="day">${day}</span>
+                            <span class="month">${month.toUpperCase()}</span>
+                            <span class="time">${event.hora || ''}</span>
+                        </div>
+                        <p class="social-meta">
+                            ${event.descripcion || ''}
+                        </p>
+                    </article>
+                `;
+                container.appendChild(slide);
+            });
+
+            initSocialSwiper();
+        },
+        error: function (err) {
+            console.error(" Error cargando eventos sociales:", err);
+        }
+    });
+
+    // ----------- INICIALIZAR SWIPERS -----------
+    function initMatchesSwiper() {
+        new Swiper(".calendar-swiper", {
+            slidesPerView: 1,
+            spaceBetween: 20,
+            grabCursor: true,
+            loop: false,
+            pagination: {
+                el: ".calendar-swiper .swiper-pagination",
+                clickable: true,
+            },
+            navigation: {
+                nextEl: ".calendar-swiper .swiper-button-next",
+                prevEl: ".calendar-swiper .swiper-button-prev",
+            },
+            breakpoints: {
+                640: {
+                    slidesPerView: 2,
+                    spaceBetween: 20
+                },
+                900: {
+                    slidesPerView: 3,
+                    spaceBetween: 20
+                }
+            }
         });
+    }
 
-    </script>
+    function initSocialSwiper() {
+        new Swiper(".social-swiper", {
+            slidesPerView: 1,
+            spaceBetween: 20,
+            grabCursor: true,
+            loop: false,
+            pagination: {
+                el: ".social-swiper .swiper-pagination",
+                clickable: true,
+            },
+            navigation: {
+                nextEl: ".social-swiper .swiper-button-next",
+                prevEl: ".social-swiper .swiper-button-prev",
+            },
+            breakpoints: {
+                640: {
+                    slidesPerView: 2,
+                    spaceBetween: 20
+                },
+                900: {
+                    slidesPerView: 3,
+                    spaceBetween: 20
+                }
+            }
+        });
+    }
+
+    document.addEventListener("click", (e) => {
+        const card = e.target.closest(".match-card, .social-card");
+        if (!card) return;
+
+        const selector = card.classList.contains('match-card') ? '.match-card' : '.social-card';
+        document.querySelectorAll(`${selector}.is-selected`).forEach(c => c.classList.remove("is-selected"));
+        card.classList.add("is-selected");
+    });
+});
+</script>
 </body>
 
 </html>

@@ -838,38 +838,52 @@ nav a:hover {
     }
 }
 
-/* --- SWIPER CALENDARIO --- */
-.calendar-swiper {
-    width: 100%;
-    padding: 20px 10px 50px 10px; 
-    overflow: hidden; 
+/* ---- SWIPER CALENDARIO ---- */
+.calendar-swiper,
+.social-swiper {
+    padding: 1rem 3rem 3rem;
+    position: relative;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+    color: #0074c4 !important;
+    width: 40px !important;
+    height: 40px !important;
+    background: rgba(0,0,0,0.7);
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.swiper-button-next:after,
+.swiper-button-prev:after {
+    font-size: 18px !important;
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+    background: #0074c4;
+    transform: scale(1.1);
+}
+
+.swiper-pagination-bullet {
+    background: rgba(255,255,255,0.4) !important;
+}
+
+.swiper-pagination-bullet-active {
+    background: #0074c4 !important;
 }
 
 .swiper-slide {
     height: auto;
     display: flex;
-    justify-content: center;
 }
 
-.match-card {
+.swiper-slide .match-card,
+.swiper-slide .social-card {
     width: 100%;
-    max-width: 380px; 
+    margin: 0;
 }
-
-.swiper-button-next, .swiper-button-prev {
-    color: #0074c4;
-    text-shadow: 0 0 10px rgba(0, 116, 196, 0.8);
-}
-
-.swiper-pagination-bullet {
-    background: #fff;
-    opacity: 0.4;
-}
-.swiper-pagination-bullet-active {
-    background: #0074c4;
-    box-shadow: 0 0 10px #0074c4;
-}
-
 /* ----------------- CALENDARIO SOCIAL ----------------- */
 
 #calendario-social {

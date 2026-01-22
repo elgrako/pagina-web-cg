@@ -1172,6 +1172,7 @@
                     const matches = results.data;
                     container.innerHTML = '';
 
+
                     if (matches.length > 0) {
                         console.log('Columnas disponibles:', Object.keys(matches[0]));
                     }
@@ -1179,18 +1180,14 @@
                     matches.reverse().forEach((match, index) => {
                         console.log(`Partido ${index}:`, match);
 
+
                         const rival = match.rival || match.Rival || match.RIVAL || '';
                         const equipo = match.equipo || match.Equipo || match.EQUIPO || 'Code Genius';
                         const fecha = match.fecha || match.Fecha || match.FECHA || '';
                         const hora = match.hora || match.Hora || match.HORA || '--:--';
 
-                        const puntosNosotros = match.puntos_nosotros || match['puntos nosotros'] ||
-                            match.Puntos_Nosotros || match['Puntos Nosotros'] ||
-                            match.PUNTOS_NOSOTROS || match['PUNTOS NOSOTROS'] || null;
-
-                        const puntosRival = match.puntos_rival || match['puntos rival'] ||
-                            match.Puntos_Rival || match['Puntos Rival'] ||
-                            match.PUNTOS_RIVAL || match['PUNTOS RIVAL'] || null;
+                        const puntosNosotros = match.puntosCG || match.PuntosCG || match.puntoscg || null;
+                        const puntosRival = match.puntosRival || match.PuntosRival || match.puntosrival || null;
 
                         console.log(`Puntos - Nosotros: ${puntosNosotros}, Rival: ${puntosRival}`);
 
@@ -1252,7 +1249,7 @@
                     initMatchesSwiper();
                 },
                 error: function (err) {
-                    console.error(" Error cargando partidos:", err);
+                    console.error("Error cargando partidos:", err);
                 }
             });
 
@@ -1314,7 +1311,7 @@
                     initSocialSwiper();
                 },
                 error: function (err) {
-                    console.error(" Error cargando eventos sociales:", err);
+                    console.error("Error cargando eventos sociales:", err);
                 }
             });
 

@@ -841,29 +841,62 @@ nav a:hover {
 /* ---- SWIPER CALENDARIO ---- */
 .calendar-swiper,
 .social-swiper {
-    padding: 1rem 3rem 3rem;
+    max-width: 1100px;         
+    margin: 0 auto;            
+    padding: 1.5rem 2.5rem 3rem;
     position: relative;
+    box-sizing: border-box;
 }
 
+/* Slides con margen real */
+.swiper-slide {
+    height: auto;
+    display: flex;
+    padding: 0.5rem;            /* evita que rompan bordes */
+    box-sizing: border-box;
+}
+
+/* Cards */
+.swiper-slide .match-card,
+.swiper-slide .social-card {
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* Flechas */
 .swiper-button-next,
 .swiper-button-prev {
     color: #0074c4 !important;
-    width: 40px !important;
-    height: 40px !important;
+    width: 36px !important;
+    height: 36px !important;
     background: rgba(0,0,0,0.7);
     border-radius: 50%;
     border: 1px solid rgba(255,255,255,0.2);
+    top: 45%;
+}
+
+.swiper-button-next {
+    right: 10px;
+}
+
+.swiper-button-prev {
+    left: 10px;
 }
 
 .swiper-button-next:after,
 .swiper-button-prev:after {
-    font-size: 18px !important;
+    font-size: 16px !important;
 }
 
 .swiper-button-next:hover,
 .swiper-button-prev:hover {
     background: #0074c4;
     transform: scale(1.1);
+}
+
+/* Paginación */
+.swiper-pagination {
+    bottom: 10px !important;
 }
 
 .swiper-pagination-bullet {
@@ -874,16 +907,6 @@ nav a:hover {
     background: #0074c4 !important;
 }
 
-.swiper-slide {
-    height: auto;
-    display: flex;
-}
-
-.swiper-slide .match-card,
-.swiper-slide .social-card {
-    width: 100%;
-    margin: 0;
-}
 /* ----------------- CALENDARIO SOCIAL ----------------- */
 
 #calendario-social {

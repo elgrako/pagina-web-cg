@@ -1,1385 +1,1683 @@
 <!DOCTYPE html>
-<html lang="es">
-
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Code Genius eSports</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MK Grand Circuit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════
+   TOKENS
+═══════════════════════════════════ */
+:root {
+  --bg0:  #020408;
+  --bg1:  #05080f;
+  --bg2:  #080d1a;
+  --bg3:  #0c1220;
+  --bg4:  #111929;
 
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="parallax.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  --blue:   #1e6fff;
+  --blue2:  #0a47cc;
+  --cyan:   #00d4ff;
+  --cyan2:  #00a8cc;
+  --glow:   rgba(30,111,255,0.35);
+  --cglow:  rgba(0,212,255,0.25);
+
+  --green:  #00ff88;
+  --red:    #ff3355;
+  --amber:  #ffb800;
+
+  --t1:  #f0f4ff;
+  --t2:  #8ba0cc;
+  --t3:  #3d5075;
+
+  --br:  rgba(30,111,255,0.12);
+  --br2: rgba(30,111,255,0.28);
+  --br3: rgba(0,212,255,0.4);
+
+  --head: 'Orbitron', monospace;
+  --body: 'Exo 2', sans-serif;
+}
+
+/* ═══════════════════════════════════
+   RESET
+═══════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0 }
+html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth }
+body {
+  background: var(--bg0);
+  color: var(--t1);
+  font-family: var(--body);
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+a { color: inherit; text-decoration: none }
+button, input, select { font-family: inherit }
+::-webkit-scrollbar { width: 4px; height: 4px }
+::-webkit-scrollbar-track { background: var(--bg0) }
+::-webkit-scrollbar-thumb { background: var(--blue2); border-radius: 2px }
+@keyframes fadeup { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+/* ═══════════════════════════════════
+   CANVAS
+═══════════════════════════════════ */
+#bg { position: fixed; inset: 0; z-index: 0; pointer-events: none }
+
+/* ═══════════════════════════════════
+   SCANLINE OVERLAY
+═══════════════════════════════════ */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 1;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.04) 2px,
+    rgba(0,0,0,0.04) 4px
+  );
+}
+
+/* ═══════════════════════════════════
+   NAV
+═══════════════════════════════════ */
+.nav {
+  position: sticky; top: 0; z-index: 200;
+  height: 60px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 32px;
+  background: rgba(2,4,8,0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--br);
+  box-shadow: 0 0 40px rgba(30,111,255,0.05);
+}
+
+.logo {
+  display: flex; align-items: center; gap: 12px;
+  font-family: var(--head);
+  font-size: 16px; font-weight: 800;
+  letter-spacing: .12em; text-transform: uppercase;
+  cursor: pointer; user-select: none;
+  flex-shrink: 0;
+}
+.logo-text { letter-spacing: .14em }
+.logo-text span { color: var(--cyan) }
+
+.nav-tabs {
+  display: flex; gap: 0;
+  border: 1px solid var(--br);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.ntab {
+  padding: 8px 20px;
+  font-family: var(--head);
+  font-size: 11px; font-weight: 600; letter-spacing: .1em;
+  color: var(--t3); cursor: pointer;
+  border: none; background: transparent;
+  transition: all .2s;
+  border-right: 1px solid var(--br);
+  text-transform: uppercase;
+}
+.ntab:last-child { border-right: none }
+.ntab:hover { color: var(--t2); background: var(--bg3) }
+.ntab.on {
+  color: var(--cyan);
+  background: linear-gradient(180deg, rgba(0,212,255,0.08) 0%, transparent 100%);
+  box-shadow: inset 0 2px 0 var(--cyan);
+}
+
+.nav-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0 }
+
+.live-badge {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(255,51,85,0.08);
+  border: 1px solid rgba(255,51,85,0.35);
+  border-radius: 2px; padding: 4px 12px;
+  font-family: var(--head); font-size: 10px;
+  font-weight: 700; color: var(--red); letter-spacing: .12em;
+  text-transform: uppercase;
+  box-shadow: 0 0 12px rgba(255,51,85,0.15);
+}
+.live-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--red);
+  animation: blink 1.2s step-end infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+.nb {
+  padding: 7px 16px; border-radius: 3px;
+  font-family: var(--head); font-size: 10px; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase;
+  cursor: pointer; border: 1px solid var(--br2);
+  background: transparent; color: var(--t2);
+  transition: all .2s;
+}
+.nb:hover { border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 12px var(--cglow) }
+.nb-blue {
+  background: var(--blue2); color: #fff; border-color: var(--blue);
+  box-shadow: 0 0 16px var(--glow);
+}
+.nb-blue:hover { background: var(--blue); box-shadow: 0 0 24px var(--glow) }
+
+.user-chip {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 14px 5px 5px;
+  background: var(--bg3); border: 1px solid var(--br2);
+  border-radius: 3px; cursor: pointer;
+  transition: all .2s;
+}
+.user-chip:hover { border-color: var(--cyan); box-shadow: 0 0 10px var(--cglow) }
+.ava {
+  width: 28px; height: 28px; border-radius: 3px;
+  background: linear-gradient(135deg, var(--blue2), var(--blue));
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--head); font-size: 10px; font-weight: 700; color: #fff;
+}
+.uname { font-size: 12px; font-weight: 600; color: var(--t2); font-family: var(--head); letter-spacing: .04em }
+
+/* ═══════════════════════════════════
+   HERO
+═══════════════════════════════════ */
+.hero {
+  position: relative; z-index: 2;
+  padding: 64px 32px 60px;
+  border-bottom: 1px solid var(--br);
+  overflow: hidden;
+}
+/* animated grid */
+.hero-grid {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(30,111,255,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(30,111,255,0.06) 1px, transparent 1px);
+  background-size: 60px 60px;
+  animation: grid-move 20s linear infinite;
+}
+@keyframes grid-move { 0%{background-position:0 0} 100%{background-position:60px 60px} }
+
+/* corner decorations */
+.hero::before {
+  content: '';
+  position: absolute; top: 0; left: 0;
+  width: 300px; height: 300px;
+  background: radial-gradient(ellipse at top left, rgba(30,111,255,0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cyan), var(--blue), transparent);
+  opacity: .5;
+}
+
+.hero-inner {
+  max-width: 1080px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 60px; position: relative; z-index: 1;
+}
+.hero-left { flex: 1; min-width: 0 }
+
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--head); font-size: 10px; font-weight: 600;
+  letter-spacing: .2em; text-transform: uppercase; color: var(--cyan);
+  margin-bottom: 20px;
+}
+.hero-eyebrow::before {
+  content: ''; width: 30px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cyan));
+}
+.hero-eyebrow::after {
+  content: ''; width: 30px; height: 1px;
+  background: linear-gradient(90deg, var(--cyan), transparent);
+}
+
+.hero-h1 {
+  font-family: var(--head);
+  font-size: clamp(38px, 5vw, 66px);
+  font-weight: 900;
+  line-height: 1; letter-spacing: .06em;
+  text-transform: uppercase; margin-bottom: 6px;
+  /* glitch-ready text */
+  position: relative;
+}
+.hero-h1 .line1 { display: block; color: var(--t1) }
+.hero-h1 .line2 {
+  display: block;
+  font-size: 65%;
+  font-weight: 600;
+  color: var(--cyan);
+  letter-spacing: .18em;
+  text-shadow: 0 0 18px rgba(0,212,255,0.4);
+  opacity: .85;
+}
+@keyframes flicker {
+  0%,90%,92%,94%,100% { opacity: 1 }
+  91%,93% { opacity: .7 }
+}
+
+.hero-sub {
+  font-size: 14px; color: var(--t2);
+  line-height: 1.7; max-width: 440px;
+  margin-top: 18px;
+}
+
+/* hero stats */
+.hero-right { flex-shrink: 0 }
+.hero-stats { display: flex; gap: 3px }
+.hstat {
+  text-align: center; padding: 20px 26px;
+  background: var(--bg2);
+  border: 1px solid var(--br);
+  position: relative; overflow: hidden;
+  transition: border-color .25s;
+}
+.hstat:hover { border-color: var(--br2) }
+.hstat::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--blue), transparent);
+  opacity: 0; transition: opacity .25s;
+}
+.hstat:hover::before { opacity: 1 }
+.hstat-n {
+  font-family: var(--head);
+  font-size: 38px; font-weight: 900;
+  color: var(--cyan); line-height: 1;
+  text-shadow: 0 0 20px var(--cglow);
+}
+.hstat-l {
+  font-family: var(--head);
+  font-size: 9px; font-weight: 600;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--t3); margin-top: 6px;
+}
+
+/* ═══════════════════════════════════
+   CONTENT
+═══════════════════════════════════ */
+.wrap {
+  max-width: 1080px; margin: 0 auto;
+  padding: 36px 32px 80px;
+  position: relative; z-index: 2;
+}
+.panel { display: none; animation: fadein .2s ease }
+.panel.on { display: block }
+@keyframes fadein { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+.sh {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 22px; gap: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--br);
+}
+.sh-title {
+  font-family: var(--head);
+  font-size: 12px; font-weight: 700; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--cyan);
+  display: flex; align-items: center; gap: 10px;
+}
+.sh-title::before {
+  content: ''; width: 3px; height: 14px;
+  background: var(--cyan); border-radius: 2px;
+  box-shadow: 0 0 8px var(--cyan);
+}
+.sh-badge {
+  font-family: var(--head); font-size: 10px; font-weight: 600;
+  letter-spacing: .08em; padding: 4px 12px; border-radius: 2px;
+  background: rgba(0,212,255,0.06);
+  color: var(--cyan); border: 1px solid rgba(0,212,255,0.2);
+}
+
+/* ═══════════════════════════════════
+   BRACKET
+═══════════════════════════════════ */
+.bracket-scroll { overflow-x: auto; padding-bottom: 16px }
+.bracket-scroll::-webkit-scrollbar { height: 3px }
+.bracket-body { display: flex; align-items: stretch; min-width: max-content }
+
+.r-col { display: flex; flex-direction: column; min-width: 190px }
+.r-label {
+  font-family: var(--head); font-size: 9px; font-weight: 700;
+  letter-spacing: .16em; text-transform: uppercase;
+  color: var(--t3); text-align: center; padding: 0 8px 14px;
+}
+.r-matches { display: flex; flex-direction: column; flex: 1; justify-content: space-around }
+.m-slot { padding: 6px 8px }
+
+.m-card {
+  background: var(--bg2); border: 1px solid var(--br);
+  border-radius: 3px; overflow: hidden;
+  transition: all .22s; position: relative;
+}
+.m-card::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
+  background: var(--blue); opacity: 0; transition: opacity .22s;
+}
+.m-card:hover { border-color: var(--br2); background: var(--bg3) }
+.m-card:hover::before { opacity: 1 }
+.m-card.live { border-color: rgba(255,51,85,.35) }
+.m-card.live::before { background: var(--red); opacity: 1; box-shadow: 0 0 8px var(--red) }
+
+.m-live-bar {
+  height: 2px;
+  background: linear-gradient(90deg, var(--red), #ff8fa0, var(--red));
+  background-size: 200% 100%;
+  animation: shimmer 1.5s linear infinite;
+}
+@keyframes shimmer { 0%{background-position:100% 0} 100%{background-position:-100% 0} }
+
+.m-team { display: flex; align-items: center; gap: 8px; padding: 9px 11px }
+.m-team + .m-team { border-top: 1px solid rgba(30,111,255,0.08) }
+.m-team.won { background: rgba(0,255,136,0.04) }
+.m-team.lost { opacity: .3 }
+
+.m-logo {
+  width: 24px; height: 24px; border-radius: 3px;
+  background: var(--bg4); border: 1px solid var(--br);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--head); font-size: 8px; font-weight: 700;
+  color: var(--t3); flex-shrink: 0; overflow: hidden;
+}
+.m-logo img { width: 100%; height: 100%; object-fit: cover }
+.m-tname {
+  font-size: 12px; font-weight: 600; flex: 1;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-family: var(--head); letter-spacing: .04em;
+}
+.m-tname.tbd { color: var(--t3); font-weight: 400; letter-spacing: 0 }
+.m-score {
+  font-family: var(--head); font-size: 14px; font-weight: 700;
+  color: var(--t3); min-width: 16px; text-align: right;
+}
+.m-score.w { color: var(--green); text-shadow: 0 0 8px var(--green) }
+
+.b-sep {
+  width: 24px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; padding-top: 36px;
+}
+.b-line { width: 100%; height: 1px; background: var(--br2); opacity: .6 }
+
+.b-winner { display: flex; align-items: center; justify-content: center; padding: 0 16px; min-width: 130px }
+.winner-card {
+  background: linear-gradient(145deg, rgba(0,212,255,0.1), rgba(30,111,255,0.06));
+  border: 1px solid rgba(0,212,255,0.3);
+  border-radius: 4px; padding: 22px 18px; text-align: center;
+  box-shadow: 0 0 30px rgba(0,212,255,0.1), inset 0 0 30px rgba(0,212,255,0.03);
+}
+.winner-crown { font-size: 28px; margin-bottom: 10px; display: block }
+.winner-lbl {
+  font-family: var(--head); font-size: 9px; font-weight: 700;
+  letter-spacing: .18em; text-transform: uppercase; color: var(--cyan);
+  margin-bottom: 8px; text-shadow: 0 0 10px var(--cyan);
+}
+.winner-name {
+  font-family: var(--head); font-size: 14px; font-weight: 700;
+  color: var(--t1); letter-spacing: .06em;
+}
+
+/* ═══════════════════════════════════
+   MY ZONE
+═══════════════════════════════════ */
+.my-zone {
+  background: var(--bg2); border: 1px solid var(--br);
+  border-radius: 4px; padding: 22px; margin-bottom: 28px;
+  position: relative; overflow: hidden;
+}
+.my-zone::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--blue), transparent);
+}
+.my-zone.has::before { background: linear-gradient(90deg, transparent, var(--cyan), var(--blue), transparent) }
+.my-zone.has { border-color: rgba(0,212,255,0.2) }
+
+.mz-head {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px; margin-bottom: 18px;
+}
+.mz-title {
+  font-family: var(--head); font-size: 11px; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--t3);
+}
+.mz-title span {
+  color: var(--cyan); margin-left: 10px; font-size: 15px;
+  letter-spacing: .06em; font-weight: 800;
+  text-shadow: 0 0 16px var(--cglow);
+}
+.mz-btns { display: flex; gap: 8px; flex-wrap: wrap }
+.mz-stats { display: flex; gap: 3px; flex-wrap: wrap }
+.mz-s {
+  flex: 1; min-width: 100px;
+  background: var(--bg3); border: 1px solid var(--br);
+  border-radius: 3px; padding: 12px 16px;
+  position: relative; overflow: hidden;
+}
+.mz-s-n {
+  font-family: var(--head); font-size: 24px; font-weight: 800;
+  color: var(--t1); line-height: 1;
+}
+.mz-s-l {
+  font-family: var(--head); font-size: 9px; font-weight: 600;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--t3); margin-top: 4px;
+}
+.enrolled-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 3px;
+  background: rgba(0,255,136,0.08); border: 1px solid rgba(0,255,136,0.25);
+  font-family: var(--head); font-size: 11px; font-weight: 700;
+  letter-spacing: .08em; color: var(--green);
+  text-shadow: 0 0 10px var(--green);
+}
+
+/* ═══════════════════════════════════
+   TEAMS GRID
+═══════════════════════════════════ */
+.teams-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 3px;
+}
+.t-card {
+  background: var(--bg2); border: 1px solid var(--br);
+  border-radius: 3px; overflow: hidden;
+  transition: all .25s; position: relative;
+}
+.t-card::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(30,111,255,0.04) 0%, transparent 60%);
+  opacity: 0; transition: opacity .25s; pointer-events: none;
+}
+.t-card:hover { border-color: var(--br2); transform: translateY(-3px); box-shadow: 0 8px 30px rgba(30,111,255,0.15) }
+.t-card:hover::after { opacity: 1 }
+.t-card.mine { border-color: rgba(0,212,255,0.3); box-shadow: 0 0 20px rgba(0,212,255,0.08) }
+
+.t-banner {
+  height: 58px; background: var(--bg3);
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+  position: relative;
+}
+.t-banner::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--blue), transparent); opacity: .4;
+}
+.t-banner img { width: 100%; height: 100%; object-fit: cover }
+.t-banner-ph {
+  font-family: var(--head); font-size: 36px; font-weight: 900;
+  color: rgba(30,111,255,0.07); user-select: none; letter-spacing: .1em;
+}
+
+.t-body { padding: 12px 14px }
+.t-ident { display: flex; align-items: center; gap: 10px; margin-bottom: 12px }
+.t-logo {
+  width: 38px; height: 38px; border-radius: 4px;
+  background: var(--bg4); border: 2px solid var(--bg0);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--head); font-size: 12px; font-weight: 800;
+  color: var(--cyan); overflow: hidden; flex-shrink: 0;
+  margin-top: -22px; position: relative; z-index: 1;
+  box-shadow: 0 0 14px rgba(0,212,255,0.2);
+}
+.t-logo img { width: 100%; height: 100%; object-fit: cover }
+.t-name {
+  font-family: var(--head); font-size: 13px; font-weight: 700;
+  letter-spacing: .06em; color: var(--t1);
+}
+.t-tag {
+  font-family: var(--head); font-size: 10px; font-weight: 600;
+  letter-spacing: .1em; color: var(--t3); text-transform: uppercase;
+}
+.t-mine-tag {
+  display: inline-block; font-family: var(--head); font-size: 8px;
+  font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  padding: 2px 8px; border-radius: 2px;
+  background: rgba(0,212,255,0.08); color: var(--cyan);
+  border: 1px solid rgba(0,212,255,0.3); margin-top: 3px;
+  text-shadow: 0 0 8px var(--cyan);
+}
+.t-row { display: flex; border-top: 1px solid var(--br); padding-top: 10px; gap: 0 }
+.t-st { flex: 1; text-align: center }
+.t-st + .t-st { border-left: 1px solid var(--br) }
+.t-st-n { font-family: var(--head); font-size: 18px; font-weight: 800; color: var(--t1) }
+.t-st-l { font-family: var(--head); font-size: 8px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--t3) }
+
+/* ═══════════════════════════════════
+   MATCHES
+═══════════════════════════════════ */
+.round-filter { display: flex; gap: 0; flex-wrap: wrap; margin-bottom: 18px; border: 1px solid var(--br); border-radius: 3px; overflow: hidden; width: fit-content }
+.rfbtn {
+  padding: 7px 18px; font-family: var(--head);
+  font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  border: none; border-right: 1px solid var(--br);
+  background: transparent; color: var(--t3); cursor: pointer; transition: all .18s;
+}
+.rfbtn:last-child { border-right: none }
+.rfbtn:hover { color: var(--t2); background: var(--bg3) }
+.rfbtn.on { color: var(--cyan); background: rgba(0,212,255,0.07); box-shadow: inset 0 2px 0 var(--cyan) }
+
+.matches-list { display: flex; flex-direction: column; gap: 3px }
+.mr {
+  background: var(--bg2); border: 1px solid var(--br);
+  border-radius: 3px; padding: 16px 20px;
+  display: grid; grid-template-columns: 1fr auto 1fr;
+  align-items: center; gap: 16px;
+  transition: all .22s; position: relative; overflow: hidden;
+}
+.mr::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: var(--br2);
+}
+.mr.live::before { background: var(--red); box-shadow: 0 0 10px var(--red) }
+.mr.done::before { background: var(--green); box-shadow: 0 0 10px var(--green) }
+.mr:hover { border-color: var(--br2); background: var(--bg3) }
+
+.mr-side { display: flex; align-items: center; gap: 10px }
+.mr-side.right { flex-direction: row-reverse; text-align: right }
+.mr-logo {
+  width: 34px; height: 34px; border-radius: 3px;
+  background: var(--bg4); border: 1px solid var(--br);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--head); font-size: 11px; font-weight: 800;
+  color: var(--t3); flex-shrink: 0; overflow: hidden;
+}
+.mr-logo img { width: 100%; height: 100%; object-fit: cover }
+.mr-tname { font-family: var(--head); font-size: 14px; font-weight: 700; letter-spacing: .06em; color: var(--t1) }
+.mr-tname.w { color: var(--green); text-shadow: 0 0 10px var(--green) }
+.mr-tname.l { color: var(--t3); font-weight: 400 }
+.mr-meta { font-family: var(--head); font-size: 9px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--t3); margin-top: 2px }
+
+.mr-center { text-align: center }
+.mr-score {
+  font-family: var(--head); font-size: 26px; font-weight: 900;
+  letter-spacing: .08em; color: var(--t1);
+}
+.mr-status {
+  font-family: var(--head); font-size: 9px; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--t3); margin-top: 2px;
+}
+.mr-status.live { color: var(--red); animation: blink 1.2s step-end infinite }
+.mr-vs {
+  font-family: var(--head); font-size: 18px; font-weight: 800;
+  color: var(--t3); letter-spacing: .1em;
+}
+
+/* ═══════════════════════════════════
+   STANDINGS
+═══════════════════════════════════ */
+.st-wrap { border: 1px solid var(--br); border-radius: 3px; overflow: hidden }
+.st-table { width: 100%; border-collapse: collapse }
+.st-table th {
+  font-family: var(--head); font-size: 9px; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--t3); padding: 12px 16px; text-align: left;
+  background: var(--bg3); border-bottom: 1px solid var(--br);
+}
+.st-table th:last-child, .st-table td:last-child { text-align: right }
+.st-tr { border-bottom: 1px solid rgba(30,111,255,0.07); transition: background .15s }
+.st-tr:last-child { border-bottom: none }
+.st-tr:hover td { background: var(--bg3) }
+.st-tr:nth-child(1) td:first-child .st-rk { text-shadow: 0 0 16px #ffd700 }
+.st-tr td { padding: 13px 16px }
+.st-rk { font-family: var(--head); font-size: 18px; font-weight: 900; color: var(--t3) }
+.st-rk.g { color: #ffd700 }
+.st-rk.s { color: #c0c0c0 }
+.st-rk.b { color: #cd7f32 }
+.st-team { display: flex; align-items: center; gap: 10px }
+.st-logo {
+  width: 28px; height: 28px; border-radius: 3px;
+  background: var(--bg4); border: 1px solid var(--br);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--head); font-size: 10px; font-weight: 800;
+  color: var(--cyan); overflow: hidden; flex-shrink: 0;
+}
+.st-logo img { width: 100%; height: 100%; object-fit: cover }
+.st-tn { font-family: var(--head); font-size: 13px; font-weight: 700; letter-spacing: .06em; color: var(--t1) }
+.st-ttag { font-family: var(--head); font-size: 9px; letter-spacing: .1em; color: var(--t2) }
+.st-num { font-family: var(--head); font-size: 14px; font-weight: 600; color: var(--t2) }
+.st-pts { font-family: var(--head); font-size: 18px; font-weight: 900; color: var(--cyan); text-shadow: 0 0 12px var(--cglow) }
+
+/* ═══════════════════════════════════
+   EMPTY / LOADING
+═══════════════════════════════════ */
+.empty {
+  text-align: center; padding: 60px 24px;
+  background: var(--bg2); border: 1px solid var(--br);
+  border-radius: 4px; position: relative; overflow: hidden;
+}
+.empty::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--blue), transparent); opacity: .4;
+}
+.empty-ico { font-size: 32px; margin-bottom: 12px; opacity: .3 }
+.empty-title {
+  font-family: var(--head); font-size: 16px; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase;
+  color: var(--t2); margin-bottom: 6px;
+}
+.empty-sub { font-size: 13px; color: var(--t3) }
+
+.spin {
+  width: 22px; height: 22px;
+  border: 2px solid var(--br2); border-top-color: var(--cyan);
+  border-radius: 50%; animation: spinr .7s linear infinite; margin: 0 auto 14px;
+}
+@keyframes spinr { to { transform: rotate(360deg) } }
+
+.err-bar {
+  background: rgba(255,51,85,.07); border: 1px solid rgba(255,51,85,.25);
+  border-radius: 3px; padding: 10px 16px;
+  font-family: var(--head); font-size: 11px; font-weight: 600;
+  letter-spacing: .06em; color: #ff7788; margin-bottom: 20px; display: none;
+}
+.err-bar.on { display: block }
+
+/* ═══════════════════════════════════
+   MODALS
+═══════════════════════════════════ */
+.ov {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(2,4,8,.92); backdrop-filter: blur(16px);
+  display: none; align-items: center; justify-content: center; padding: 20px;
+}
+.ov.on { display: flex }
+.modal {
+  background: var(--bg2); border: 1px solid var(--br2);
+  border-radius: 4px; width: 100%; max-width: 420px;
+  max-height: 90vh; overflow-y: auto;
+  animation: modal-in .22s cubic-bezier(.22,.68,0,1.2);
+  box-shadow: 0 0 60px rgba(30,111,255,0.15);
+  position: relative;
+}
+.modal::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--cyan), var(--blue), transparent);
+}
+@keyframes modal-in { from{transform:scale(.95) translateY(12px);opacity:0} to{transform:scale(1) translateY(0);opacity:1} }
+
+.mhead {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 22px 24px 0;
+}
+.mtitle {
+  font-family: var(--head); font-size: 16px; font-weight: 800;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--t1);
+}
+.mx {
+  width: 28px; height: 28px; border-radius: 3px;
+  border: 1px solid var(--br); background: transparent;
+  color: var(--t3); cursor: pointer; font-size: 14px;
+  display: flex; align-items: center; justify-content: center; transition: all .15s;
+}
+.mx:hover { border-color: var(--red); color: var(--red) }
+.mbody { padding: 20px 24px 26px }
+
+.mtabs { display: flex; border-bottom: 1px solid var(--br); margin-bottom: 20px }
+.mtab {
+  flex: 1; padding: 10px; font-family: var(--head);
+  font-size: 11px; font-weight: 700; text-align: center; letter-spacing: .08em;
+  text-transform: uppercase; cursor: pointer; border: none;
+  background: transparent; color: var(--t3);
+  border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all .18s;
+}
+.mtab.on { color: var(--cyan); border-bottom-color: var(--cyan); text-shadow: 0 0 10px var(--cyan) }
+
+.fg { margin-bottom: 16px }
+.fl {
+  display: block; font-family: var(--head); font-size: 9px; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--t3); margin-bottom: 7px;
+}
+.fi {
+  width: 100%; background: var(--bg3);
+  border: 1px solid var(--br); border-radius: 3px;
+  padding: 10px 14px; color: var(--t1);
+  font-size: 13px; transition: border-color .2s; outline: none;
+}
+.fi:focus { border-color: rgba(0,212,255,0.5); box-shadow: 0 0 12px rgba(0,212,255,0.1) }
+.fi::placeholder { color: var(--t3) }
+.fi-hint { font-size: 11px; color: var(--t3); margin-top: 5px; line-height: 1.5 }
+
+.ferr {
+  background: rgba(255,51,85,.07); border: 1px solid rgba(255,51,85,.25);
+  border-radius: 3px; padding: 9px 13px;
+  font-size: 12px; color: #ff7788; margin-bottom: 14px; display: none;
+}
+.ferr.on { display: block }
+.fok {
+  background: rgba(0,255,136,.07); border: 1px solid rgba(0,255,136,.25);
+  border-radius: 3px; padding: 9px 13px;
+  font-size: 12px; color: #5ef0a0; margin-bottom: 14px; display: none;
+}
+.fok.on { display: block }
+
+.fsub {
+  width: 100%; background: linear-gradient(90deg, var(--blue2), var(--blue));
+  color: #fff; border: none; padding: 13px; border-radius: 3px;
+  font-family: var(--head); font-size: 13px; font-weight: 800;
+  letter-spacing: .12em; text-transform: uppercase;
+  cursor: pointer; margin-top: 6px;
+  transition: all .2s;
+  box-shadow: 0 0 20px var(--glow);
+}
+.fsub:hover { box-shadow: 0 0 30px var(--glow), 0 0 60px rgba(30,111,255,0.15); transform: translateY(-1px) }
+.fsub:disabled { opacity: .4; cursor: not-allowed; transform: none }
+
+.ibox {
+  background: var(--bg3); border: 1px solid var(--br); border-radius: 3px;
+  padding: 12px 15px; margin-bottom: 12px;
+}
+.ibox-l {
+  font-family: var(--head); font-size: 8px; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--t3); margin-bottom: 5px;
+}
+.ibox-v { font-family: var(--head); font-size: 14px; font-weight: 700; color: var(--t1); letter-spacing: .04em }
+
+.members-list { display: flex; flex-direction: column; gap: 6px; margin-top: 12px }
+.member-row {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--bg3); border: 1px solid var(--br); border-radius: 3px; padding: 9px 13px;
+}
+.member-info { display: flex; align-items: center; gap: 10px }
+.member-ava {
+  width: 26px; height: 26px; border-radius: 3px;
+  background: var(--blue2);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--head); font-size: 9px; font-weight: 800; color: #fff;
+}
+.member-name { font-family: var(--head); font-size: 12px; font-weight: 700; letter-spacing: .04em; color: var(--t1) }
+.member-id { font-size: 10px; color: var(--t3); margin-top: 1px }
+.role-tag {
+  font-family: var(--head); font-size: 8px; font-weight: 700; letter-spacing: .1em;
+  padding: 3px 8px; border-radius: 2px; text-transform: uppercase;
+  background: rgba(30,111,255,.1); color: var(--cyan);
+  border: 1px solid rgba(0,212,255,.25);
+}
+.role-tag.member {
+  background: rgba(0,255,136,.08); color: var(--green); border-color: rgba(0,255,136,.2);
+}
+.remove-btn {
+  background: transparent; border: none; color: var(--t3);
+  cursor: pointer; font-size: 14px; padding: 3px 7px; border-radius: 3px; transition: color .15s;
+}
+.remove-btn:hover { color: var(--red) }
+
+/* ═══════════════════════════════════
+   TOAST
+═══════════════════════════════════ */
+.toast {
+  position: fixed; bottom: 28px; left: 50%;
+  transform: translateX(-50%) translateY(16px);
+  background: var(--bg3); border: 1px solid var(--br2);
+  border-radius: 3px; padding: 10px 22px;
+  font-family: var(--head); font-size: 11px; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase;
+  z-index: 999; opacity: 0; pointer-events: none;
+  transition: all .28s cubic-bezier(.22,.68,0,1.2); white-space: nowrap;
+}
+.toast.on { opacity: 1; transform: translateX(-50%) translateY(0) }
+.toast.ok { color: var(--green); border-color: rgba(0,255,136,.35); box-shadow: 0 0 20px rgba(0,255,136,.1) }
+.toast.err { color: var(--red); border-color: rgba(255,51,85,.35); box-shadow: 0 0 20px rgba(255,51,85,.1) }
+
+/* ═══════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════ */
+@media (max-width: 700px) {
+  .hero-inner { flex-direction: column; align-items: flex-start }
+  .hero-stats { display: grid; grid-template-columns: repeat(3,1fr); width: 100% }
+  .nav-tabs { display: none }
+  .mr { grid-template-columns: 1fr; gap: 8px }
+  .mr-side.right { flex-direction: row; text-align: left }
+  .wrap { padding: 24px 18px 60px }
+  .hero { padding: 40px 18px 40px }
+  .nav { padding: 0 18px }
+}
+</style>
 </head>
-
 <body>
+<canvas id="bg"></canvas>
 
-    <!-- NAVBAR -->
-    <header>
-        <div class="nav-inner">
-            <div class="logo">
-                CODE GENIUS
-                <span>eSports Club</span>
-            </div>
-            <nav>
-                <ul>
-                    <li><a href="#inicio">Inicio</a></li>
-                    <li><a href="#sobrecg">Sobre Nosotros</a></li>
-                    <li><a href="#calendario">Calendario</a></li>
-                    <li><a href="#equipos-3d">Equipo</a></li>
-                    <li><a href="#jugadores">Jugadores</a></li>
-                    <li><a href="https://discord.gg/f2f94avR9p">Unete</a></li>
-                    <li><a href="#tutoriales" class="nav-tutoriales">Tutoriales</a></li>
+<!-- NAV -->
+<nav class="nav">
+  <div class="logo" onclick="gotoTab('bracket')">
+    <img src="gclogo.png" alt="GC" style="height:36px;width:auto;display:block;filter:drop-shadow(0 0 8px rgba(0,212,255,0.4))">
+    <span class="logo-text"><span>Grand</span> Circuit</span>
+  </div>
+  <div class="nav-tabs">
+    <button class="ntab on"  onclick="gotoTab('info')"      data-i18n="tab_info">Info</button>
+    <button class="ntab"     onclick="gotoTab('bracket')"   data-i18n="tab_bracket">Bracket</button>
+    <button class="ntab"     onclick="gotoTab('teams')"     data-i18n="tab_teams">Teams</button>
+    <button class="ntab"     onclick="gotoTab('matches')"   data-i18n="tab_matches">Matches</button>
+    <button class="ntab"     onclick="gotoTab('standings')" data-i18n="tab_standings">Standings</button>
+  </div>
+  <div class="nav-right" id="nav-right"></div>
+</nav>
+<!-- lang toggle rendered inside nav-right by JS -->
 
-                </ul>
-            </nav>
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="hero-eyebrow" id="hero-tag">Loading…</div>
+      <h1 class="hero-h1" style="display:flex;flex-direction:column;align-items:center;text-align:center">
+        <span class="line1" style="display:flex;align-items:center;justify-content:center;gap:20px">
+          <img src="gclogo.png" alt="GC" style="height:clamp(80px,10vw,120px);width:auto;filter:drop-shadow(0 0 22px rgba(0,212,255,0.55))">
+          Grand
+        </span>
+        <span class="line2" style="text-align:center">Circuit</span>
+      </h1>
+      <p class="hero-sub" id="hero-sub" style="display:none"></p>
+    </div>
+    <div class="hero-right">
+      <div class="hero-stats">
+        <div class="hstat"><div class="hstat-n" id="st-teams">—</div><div class="hstat-l" data-i18n="stat_teams">Teams</div></div>
+        <div class="hstat"><div class="hstat-n" id="st-rounds">—</div><div class="hstat-l" data-i18n="stat_rounds">Rounds</div></div>
+        <div class="hstat"><div class="hstat-n" id="st-matches">—</div><div class="hstat-l" data-i18n="stat_matches">Matches</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="wrap">
+  <div class="err-bar" id="err-bar" data-i18n="err_conn">⚠ Could not connect to server.</div>
+
+  <div class="panel on" id="panel-info">
+    <div class="sh"><span class="sh-title" data-i18n="info_title">How it works</span><span class="sh-badge" data-i18n="info_badge">Getting started</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px">
+
+      <div style="background:var(--bg2);border:1px solid var(--br);border-radius:8px;overflow:hidden">
+        <div style="height:3px;background:linear-gradient(90deg,var(--blue),var(--cyan))"></div>
+        <div style="padding:22px">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+            <div style="width:36px;height:36px;border-radius:6px;background:rgba(30,111,255,0.12);border:1px solid rgba(30,111,255,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--head);font-size:16px;font-weight:800;color:var(--cyan)">01</div>
+            <div style="font-family:var(--head);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t1)" data-i18n="s1_title">Create your account</div>
+          </div>
+          <p style="font-size:14px;color:var(--t2);line-height:1.75;margin-bottom:12px" data-i18n="s1_body">Click <strong style="color:var(--t1)">Register</strong> in the top right corner. Choose a username, enter your email and a password of at least 6 characters.</p>
+          <div style="background:var(--bg3);border:1px solid var(--br);border-radius:5px;padding:10px 14px">
+            <div style="font-family:var(--head);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);margin-bottom:4px" data-i18n="s1_note_title">Your User ID</div>
+            <div style="font-size:13px;color:var(--t2)" data-i18n="s1_note_body">Once logged in, click your username (top right) to see your <strong style="color:var(--cyan)">User ID</strong>. Share it with your captain so they can add you to the team.</div>
+          </div>
         </div>
-    </header>
+      </div>
 
-    <!-- SVGS -->
-    <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
-
-        <symbol id="icon-twitch" viewBox="0 0 24 24">
-            <path
-                d="M3 2h18v12.5l-4 3.5h-4l-3 3H7v-3H3V2zm2 2v11h4v3l2.5-2.5H15l3-2.5V4H5zm9 2h2v6h-2V6zm-5 0h2v6H9V6z" />
-        </symbol>
-
-        <symbol id="icon-x" viewBox="0 0 24 24">
-            <path d="M3 3h4.5L13 10.1 18.5 3H21l-7 9.2 7 8.8h-4.5L11 14l-5.5 7H3l7-9.1z" />
-        </symbol>
-
-        <symbol id="icon-youtube" viewBox="0 0 24 24">
-            <path
-                d="M21.8 8.001a2.75 2.75 0 0 0-1.93-1.95C18.1 5.5 12 5.5 12 5.5s-6.1
-                         0-7.87.55A2.75 2.75 0 0 0 2.2 8C1.75 9.78 1.75 12 1.75 12s0 2.22.45 
-                         4.001a2.75 2.75 0 0 0 1.93 1.95C5.9 18.5 12 18.5 12 18.5s6.1 0 7.87-.55a2.75
-                          2.75 0 0 0 1.93-1.95C22.25 14.22 22.25 12 22.25 12s0-2.22-.45-3.999zM10 15.25v-6.5L15.5 12 10 15.25z" />
-        </symbol>
-
-    </svg>
-
-    <!-- SECCION INICIAL -->
-    <section id="inicio" class="parallax">
-        <div class="parallax-content">
-            <p class="tagline">eSports Club</p>
-            <h1 class="hero-title">
-                Bienvenido a <br><span>Code Genius</span>
-            </h1>
-
-            <div class="hero-buttons">
-                <a href="https://discord.gg/f2f94avR9p" class="btn btn-primary">Unete al club</a>
-                <a href="#equipos" class="btn btn-ghost">Ver nuestros equipos</a>
-            </div>
+      <div style="background:var(--bg2);border:1px solid var(--br);border-radius:8px;overflow:hidden">
+        <div style="height:3px;background:linear-gradient(90deg,var(--cyan),var(--green))"></div>
+        <div style="padding:22px">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+            <div style="width:36px;height:36px;border-radius:6px;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--head);font-size:16px;font-weight:800;color:var(--cyan)">02</div>
+            <div style="font-family:var(--head);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t1)" data-i18n="s2_title">Create your team</div>
+          </div>
+          <p style="font-size:14px;color:var(--t2);line-height:1.75;margin-bottom:12px" data-i18n="s2_body">Go to the <strong style="color:var(--t1)">Teams</strong> tab and click <strong style="color:var(--t1)">+ Create Team</strong>. Pick a name and a short tag (e.g. <span style="font-family:var(--head);color:var(--cyan);font-size:13px">CG</span>). You become the team captain.</p>
+          <div style="background:var(--bg3);border:1px solid var(--br);border-radius:5px;padding:10px 14px">
+            <div style="font-family:var(--head);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);margin-bottom:4px" data-i18n="s2_note_title">One team per player</div>
+            <div style="font-size:13px;color:var(--t2)" data-i18n="s2_note_body">Each account can only belong to one team at a time.</div>
+          </div>
         </div>
+      </div>
 
-        <div class="hero-socials">
-            <!-- YouTube -->
-            <a href="https://www.youtube.com/@CodeGeniusMK" target="_blank" class="social-icon" aria-label="YouTube">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path
-                        d="M21.8 8.001a2.75 2.75 0 0 0-1.93-1.95C18.1 5.5 12 5.5 12 5.5s-6.1
-                         0-7.87.55A2.75 2.75 0 0 0 2.2 8C1.75 9.78 1.75 12 1.75 12s0 2.22.45 
-                         4.001a2.75 2.75 0 0 0 1.93 1.95C5.9 18.5 12 18.5 12 18.5s6.1 0 7.87-.55a2.75
-                          2.75 0 0 0 1.93-1.95C22.25 14.22 22.25 12 22.25 12s0-2.22-.45-3.999zM10 15.25v-6.5L15.5 12 10 15.25z" />
-                </svg>
-            </a>
-
-            <!-- Twitch -->
-            <a href="https://www.twitch.tv/codegeniusmk" target="_blank" class="social-icon" aria-label="Twitch">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path
-                        d="M3 2h18v12.5l-4 3.5h-4l-3 3H7v-3H3V2zm2 2v11h4v3l2.5-2.5H15l3-2.5V4H5zm9 2h2v6h-2V6zm-5 0h2v6H9V6z" />
-                </svg>
-            </a>
-
-            <!-- Instagram -->
-            <a href="https://www.instagram.com/codegeniusmkw/" target="_blank" class="social-icon"
-                aria-label="Instagram">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M7 2C4.24 2 2 4.24 2 7v10c0 2.76 2.24 5 5 5h10c2.76 
-            0 5-2.24 5-5V7c0-2.76-2.24-5-5-5H7zm10 2c1.65 0 3 1.35 
-            3 3v10c0 1.65-1.35 3-3 3H7c-1.65 0-3-1.35-3-3V7c0-1.65 
-            1.35-3 3-3h10zm-5 3.5A5.5 5.5 0 1 0 17.5 13 5.51 5.51 
-            0 0 0 12 7.5zm0 2A3.5 3.5 0 1 1 8.5 13 3.5 3.5 0 0 
-            1 12 9.5zm4.25-.75a1.25 1.25 0 1 0-.0001-2.5 1.25 1.25 
-            0 0 0 .0001 2.5z" />
-                </svg>
-            </a>
-
-            <!-- TikTok -->
-            <a href="https://www.tiktok.com/@codegeniusmk" target="_blank" class="social-icon" aria-label="TikTok">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12.5 2h2.8c.2 1.5.9 2.8 2 3.8a6 6 0 0 0 3.7
-                     1.3v2.8a8.7 8.7 0 0 1-3.4-.8v6.5a6.5 6.5 0 1 1-5.9-6.4v3a3.1 3.1 0 1 0 2 2.9V2z" />
-                </svg>
-            </a>
-
-            <!-- X / Twitter -->
-            <a href="https://x.com/CodeGeniusMK" target="_blank" class="social-icon" aria-label="X Twitter">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M3 3h4.5L13 10.1 18.5 3H21l-7 9.2 7 8.8h-4.5L11 14l-5.5 7H3l7-9.1z" />
-                </svg>
-            </a>
-
-            <!-- Discord -->
-            <a href="https://discord.gg/f2f94avR9p" target="_blank" class="social-icon" aria-label="Discord">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M20.22 4.02a19.6 19.6 0 0 0-4.27-1.35.1.1 0 0 0-.1.05c-.18.33-.38.76-.52 1.1a17.5 
-        17.5 0 0 0-6.64 0c-.14-.34-.34-.77-.52-1.1a.1.1 0 0 0-.1-.05c-1.47.27-2.91.73-4.27 
-        1.35a.1.1 0 0 0-.05.04C1.55 8.2.97 12.3 1.35 16.36a.1.1 0 0 0 .03.06 19.4 19.4 0 0 0 
-        5.2 2.72.1.1 0 0 0 .12-.05c.4-.55.76-1.14 1.08-1.73a.1.1 0 0 0-.06-.15 12.9 12.9 0 
-        0 1-1.86-.88.1.1 0 0 1-.01-.17c.12-.09.24-.18.36-.27a.1.1 0 0 1 .1-.01c3.93 1.82 
-        8.2 1.82 12.12 0a.1.1 0 0 1 .1.01c.12.09.24.18.36.27a.1.1 0 0 1 0 .17 12.3 12.3 0 0 
-        1-1.86.88.1.1 0 0 0-.06.15c.32.59.68 1.18 1.08 1.73a.1.1 0 0 0 .12.05 19.7 19.7 0 
-        0 0 5.2-2.72.1.1 0 0 0 .03-.06c.46-4.25-.17-8.33-2.77-12.3a.1.1 0 0 0-.05-.04zM8.7 
-        15.5c-1 0-1.8-.94-1.8-2.1 0-1.17.8-2.1 1.8-2.1 1 0 1.82.96 1.8 2.1 0 1.16-.8 2.1-1.8 
-        2.1zm6.6 0c-1 0-1.8-.94-1.8-2.1 0-1.17.8-2.1 1.8-2.1 1 0 1.82.96 1.8 2.1 0 1.16-.8 2.1-1.8 
-        2.1z" />
-                </svg>
-            </a>
+      <div style="background:var(--bg2);border:1px solid var(--br);border-radius:8px;overflow:hidden">
+        <div style="height:3px;background:linear-gradient(90deg,var(--green),var(--amber))"></div>
+        <div style="padding:22px">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+            <div style="width:36px;height:36px;border-radius:6px;background:rgba(0,232,122,0.08);border:1px solid rgba(0,232,122,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--head);font-size:16px;font-weight:800;color:var(--green)">03</div>
+            <div style="font-family:var(--head);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t1)" data-i18n="s3_title">Add your players</div>
+          </div>
+          <p style="font-size:14px;color:var(--t2);line-height:1.75;margin-bottom:12px" data-i18n="s3_body">Each teammate must create their own account first and share their User ID with you. As captain, click <strong style="color:var(--t1)">Manage Team</strong> in the Teams tab and paste each player's User ID.</p>
+          <div style="background:var(--bg3);border:1px solid var(--br);border-radius:5px;padding:10px 14px">
+            <div style="font-family:var(--head);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);margin-bottom:4px" data-i18n="s3_note_title">Captain only</div>
+            <div style="font-size:13px;color:var(--t2)" data-i18n="s3_note_body">Only the team Owner can add or remove players.</div>
+          </div>
         </div>
-    </section>
+      </div>
 
-
-    <!---- SECCION SOBRE NOSOTROS ---->
-    <section class="section section--about" id="sobrecg">
-        <h2 class="section-title">Sobre Code Genius</h2>
-        <p class="section-subtitle">Club & Filosofía</p>
-
-        <div class="about-inner">
-            <div class="grid-2 about-grid">
-                <div class="about-text">
-                    <p>
-                        Code Genius nace con la idea de jugar y
-                        competir sin presiones ni ataduras.
-                        El club se crea para que cada jugador pueda elegir libremente con quién juega y con qué equipo
-                        se siente más a gusto.
-
-                        Aquí lo importante es disfrutar del juego,
-                        pasarlo bien y mejorar juntos, siempre en un ambiente sano y con buen rollo.
-                        Competimos porque nos gusta competir, pero sin perder de vista lo principal: divertirse jugando
-                        con gente con la que da gusto estar.
-                    </p>
-                </div>
-                <div class="about-video-wrapper">
-                    <iframe width="560" height="315" src="https://www.youtube.com/embed/9Jb2Df27Zrw?si=7ySdMwcp1ctjb9an"
-                        title="YouTube video player" frameborder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-                </div>
-            </div>
+      <div style="background:var(--bg2);border:1px solid var(--br);border-radius:8px;overflow:hidden">
+        <div style="height:3px;background:linear-gradient(90deg,var(--amber),var(--red))"></div>
+        <div style="padding:22px">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+            <div style="width:36px;height:36px;border-radius:6px;background:rgba(255,184,0,0.08);border:1px solid rgba(255,184,0,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--head);font-size:16px;font-weight:800;color:var(--amber)">04</div>
+            <div style="font-family:var(--head);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t1)" data-i18n="s4_title">Enroll in the tournament</div>
+          </div>
+          <p style="font-size:14px;color:var(--t2);line-height:1.75;margin-bottom:12px" data-i18n="s4_body">Once your team is ready, click <strong style="color:var(--t1)">Enroll in Tournament</strong> in the Teams tab. The admin will review and approve your request. Once approved you'll appear in the bracket.</p>
+          <div style="background:var(--bg3);border:1px solid var(--br);border-radius:5px;padding:10px 14px">
+            <div style="font-family:var(--head);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);margin-bottom:4px" data-i18n="s4_note_title">Registration must be open</div>
+            <div style="font-size:13px;color:var(--t2)" data-i18n="s4_note_body">Enrollment only works when the tournament status is <span style="font-family:var(--head);color:var(--cyan);font-size:12px">OPEN</span>.</div>
+          </div>
         </div>
-    </section>
-
-
-
-    <!-- PARALLAX ESPACIO -->
-    <section class="space-banner">
-        <div class="space-banner-inner">
-            <div class="space-logo-big">
-                <div class="space-logo-glow"></div>
-                <img src="img/cglogo.png" alt="Logo Code Genius">
-            </div>
-        </div>
-    </section>
-
-    <!-- CALENDARIO -->
-    <section id="calendario">
-        <div class="section calendario-inner">
-            <h2 class="section-title">Calendario de partidos</h2>
-            <p class="section-subtitle">Últimos enfrentamientos</p>
-
-            <div class="swiper calendar-swiper">
-                <div class="swiper-wrapper" id="matches-container">
-                </div>
-
-                <div class="swiper-pagination"></div>
-                <div class="swiper-button-prev"></div>
-                <div class="swiper-button-next"></div>
-            </div>
-        </div>
-    </section>
-
-
-
-    <!-- CALENDARIO SOCIAL -->
-    <section id="calendario-social">
-        <div class="section calendario-inner">
-            <h2 class="section-title">Calendario Social</h2>
-            <p class="section-subtitle">Próximos Eventos</p>
-
-            <div class="swiper social-swiper">
-                <div class="swiper-wrapper" id="social-container">
-                    <!-- Los eventos se cargan aquí -->
-                </div>
-
-                <div class="swiper-pagination"></div>
-                <div class="swiper-button-prev"></div>
-                <div class="swiper-button-next"></div>
-            </div>
-        </div>
-    </section>
-
-    <!-- BANNER CODE GENIUS -->
-    <section class="cg-strip">
-        <div class="cg-strip-inner">
-            <div class="cg-pill">
-                <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
-                <span class="cg-text">Code Genius</span>
-            </div>
-            <div class="cg-pill">
-                <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
-                <span class="cg-text">Code Genius</span>
-            </div>
-            <div class="cg-pill">
-                <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
-                <span class="cg-text">Code Genius</span>
-            </div>
-            <div class="cg-pill">
-                <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
-                <span class="cg-text">Code Genius</span>
-            </div>
-            <div class="cg-pill">
-                <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
-                <span class="cg-text">Code Genius</span>
-            </div>
-            <div class="cg-pill">
-                <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
-                <span class="cg-text">Code Genius</span>
-            </div>
-            <div class="cg-pill">
-                <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
-                <span class="cg-text">Code Genius</span>
-            </div>
-            <div class="cg-pill">
-                <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
-                <span class="cg-text">Code Genius</span>
-            </div>
-            <div class="cg-pill">
-                <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
-                <span class="cg-text">Code Genius</span>
-            </div>
-            <div class="cg-pill">
-                <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
-                <span class="cg-text">Code Genius</span>
-            </div>
-
-            <div class="cg-pill">
-                <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
-                <span class="cg-text">Code Genius</span>
-            </div>
-            <div class="cg-pill">
-                <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
-                <span class="cg-text">Code Genius</span>
-            </div>
-            <div class="cg-pill">
-                <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
-                <span class="cg-text">Code Genius</span>
-            </div>
-            <div class="cg-pill">
-                <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
-                <span class="cg-text">Code Genius</span>
-            </div>
-            <div class="cg-pill">
-                <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
-                <span class="cg-text">Code Genius</span>
-            </div>
-            <div class="cg-pill">
-                <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
-                <span class="cg-text">Code Genius</span>
-            </div>
-            <div class="cg-pill">
-                <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
-                <span class="cg-text">Code Genius</span>
-            </div>
-            <div class="cg-pill">
-                <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
-                <span class="cg-text">Code Genius</span>
-            </div>
-            <div class="cg-pill">
-                <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
-                <span class="cg-text">Code Genius</span>
-            </div>
-            <div class="cg-pill">
-                <img src="img/cglogo.png" alt="Code Genius" class="cg-logo">
-                <span class="cg-text">Code Genius</span>
-            </div>
-        </div>
-    </section>
-
-    <!-- SECCION EQUIPOS -->
-    <section id="equipos-3d">
-        <div class="equipos3d-inner">
-            <h2 class="section-title">NUESTROS EQUIPOS</h2>
-            <p class="section-subtitle">haz clic en los puntos brillantes</p>
-
-            <div class="model-3d-container" id="model-container">
-                <div class="model-3d-wrapper" id="model-wrapper">
-                    <img src="img/modelo-3d.png" alt="Code Genius 3D Model" class="model-3d-image" id="model-image">
-
-                    <!-- Hotspots -->
-                    <div class="hotspot hotspot-cg" id="hotspot-cg" data-team="cg">
-                    </div>
-                    <div class="hotspot hotspot-cgen" id="hotspot-cgen" data-team="cgen">
-
-                    </div>
-                </div>
-            </div>
-
-            <!-- Cards -->
-            <div class="teams-reveal">
-                <div class="team-card team-card--cg" id="team-card-cg">
-                    <div class="team-name">Code Genius</div>
-                    <div class="team-meta">
-                        Roster principal del club. De aquí salen los jugadores que quedaron 11 en Starting Line 2.
-                        Activos, con ganas de enseñar y mejorar a futuros jugadores.
-                    </div>
-                    <div class="team-tags">
-                        <span class="team-tag">Competitivo</span>
-                        <span class="team-tag">Coaching</span>
-                        <span class="team-tag">Contenido</span>
-                    </div>
-                </div>
-
-                <div class="team-card team-card--cgen" id="team-card-cgen">
-                    <div class="team-name">Code Genesis</div>
-                    <div class="team-meta">
-                        Roster formado por jugadores de RK2 y RK3: familia grande, buen rollo e ideas alocadas.
-                    </div>
-                    <div class="team-tags">
-                        <span class="team-tag">Familia</span>
-                        <span class="team-tag">Diversión</span>
-                        <span class="team-tag">Locura</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- PARALLAX ESPACIO -->
-    <section class="space-banner1">
-        <div class="space-banner-inner1">
-            <div class="space-logo-big1">
-                <div class="space-logo-glow"></div>
-            </div>
-        </div>
-    </section>
-
-    <!-- SECCION JUGADORES -->
-    <section id="jugadores">
-        <h2 class="section-title">Nuestros jugadores</h2>
-        <p class="section-subtitle">Rosters por equipos</p>
-
-        <!-- TITULO EQUIPO PRINCIPAL -->
-        <div class="players-team-heading players-team-heading--team1">
-            <h3 class="players-team-kicker">Code Genius</h3>
-        </div>
-
-        <!-- CARRUSEL EQUIPO PRINCIPAL -->
-        <div class="player-carousel player-carousel--team1">
-            <button class="carousel-arrow prev" aria-label="Jugador anterior">‹</button>
-
-            <div class="player-track">
-                <!-- CEO Sipgb -->
-                <article class="player-card active" data-index="0">
-                    <div class="player-portrait">
-                        <div class="portrait-circle">
-                            <img src="img/sipgb.png" alt="Sipgb">
-                        </div>
-                    </div>
-                    <div class="player-info">
-                        <h3 class="player-name">Sipgb
-                            <img class="player-flag" src="img/flags/españa.png" alt="España">
-                            <img class="player-flag" src="img/flags/suecia.png" alt="Suecia">
-                        </h3>
-                        <p class="player-role">CEO</p>
-                        <p class="player-bio">
-                            Fundador y CEO de Code Genius.
-                            Apasionado del Mario Kart y los eSports competitivos
-                        </p>
-                        <div class="player-tags">
-                            <span class="player-tag">CEO</span>
-                            <span class="player-tag">Coaching</span>
-                            <span class="player-tag">Organizador</span>
-                        </div>
-                    </div>
-                </article>
-
-                <!-- CAPITAN Seral -->
-                <article class="player-card" data-index="1">
-                    <div class="player-portrait">
-                        <div class="portrait-circle">
-                            <img src="img/seral.png" alt="Seral">
-                        </div>
-                    </div>
-                    <div class="player-info">
-                        <h3 class="player-name">Seral
-                            <img class="player-flag" src="img/flags/españa.png" alt="España">
-                        </h3>
-                        <p class="player-role">Capitán Code Genius</p>
-                        <p class="player-bio">
-                            Jugador de Code Genius y capitán, main avutarda desde la beta
-                        </p>
-                        <div class="player-tags">
-                            <span class="player-tag">Capitán</span>
-                        </div>
-                    </div>
-                </article>
-
-                <!--Staff Graco -->
-                <article class="player-card" data-index="2">
-                    <div class="player-portrait">
-                        <div class="portrait-circle">
-                            <img src="img/graco.png" alt="graco">
-                        </div>
-                    </div>
-                    <div class="player-info">
-                        <h3 class="player-name">elgraco
-                            <img class="player-flag" src="img/flags/españa.png" alt="España">
-                        </h3>
-                        <p class="player-role">Staff Code Genius</p>
-                        <p class="player-bio">
-                            Jugador de Code Genius y miembro del staff, literalmente un topo
-                        </p>
-                        <div class="player-socials">
-                            <a href=" https://www.twitch.tv/elgraco" class="player-social-icon" aria-label="Twitch">
-                                <svg>
-                                    <use href="#icon-twitch"></use>
-                                </svg>
-                            </a>
-                        </div>
-                    </div>
-                </article>
-
-                <!-- Player Onix -->
-                <article class="player-card" data-index="3">
-                    <div class="player-portrait">
-                        <div class="portrait-circle">
-                            <img src="img/onix.png" alt="Onix">
-                        </div>
-                    </div>
-                    <div class="player-info">
-                        <h3 class="player-name">iLyOniiX
-                            <img class="player-flag" src="img/flags/españa.png" alt="España">
-                        </h3>
-                        <p class="player-role">Jugador Code Genius</p>
-                        <p class="player-bio">
-                            Gallego, gordito y cocinero. let him cook!
-                        </p>
-                        <div class="player-socials">
-                            <a href="https://www.twitch.tv/ilyoniiix" class="player-social-icon" aria-label="Twitch">
-                                <svg>
-                                    <use href="#icon-twitch"></use>
-                                </svg>
-                            </a>
-                        </div>
-                    </div>
-                </article>
-
-                <!-- Player Vick -->
-                <article class="player-card active" data-index="0">
-                    <div class="player-portrait">
-                        <div class="portrait-circle">
-                            <img src="img/vick.png" alt="Vick">
-                        </div>
-                    </div>
-                    <div class="player-info">
-                        <h3 class="player-name">Vick6804
-                            <img class="player-flag" src="img/flags/españa.png" alt="España">
-                        </h3>
-                        <p class="player-role">Jugador Code Genius</p>
-                        <p class="player-bio">
-                            Fan número uno de Code Genius, sordo, ciego y manco
-                        </p>
-                        <div class="player-socials">
-                            <a href="https://www.twitch.tv/vick6804" class="player-social-icon" aria-label="Twitch">
-                                <svg>
-                                    <use href="#icon-twitch"></use>
-                                </svg>
-                            </a>
-
-                            <a href="https://x.com/Vick6804" class="player-social-icon" aria-label="X">
-                                <svg>
-                                    <use href="#icon-x"></use>
-                                </svg>
-                            </a>
-                        </div>
-                    </div>
-                </article>
-
-                <!-- Player Yiyo -->
-                <article class="player-card" data-index="1">
-                    <div class="player-portrait">
-                        <div class="portrait-circle">
-                            <img src="img/yiyo.png" alt="Yiyo">
-                        </div>
-                    </div>
-                    <div class="player-info">
-                        <h3 class="player-name">Yiyo
-                            <img class="player-flag" src="img/flags/chile.png" alt="Chile">
-                        </h3>
-                        <p class="player-role">Jugador Code Genius</p>
-                        <p class="player-bio">
-                            Chileno, veloz y simplemente la cabra, el mejor chileno (hay 2)
-                        </p>
-                        <div class="player-tags">
-                        </div>
-                    </div>
-                </article>
-
-                <!-- Player Yegu07 -->
-                <article class="player-card" data-index="2">
-                    <div class="player-portrait">
-                        <div class="portrait-circle">
-                            <img src="img/yegu.gif" alt="Yegu07">
-                        </div>
-                    </div>
-                    <div class="player-info">
-                        <h3 class="player-name">Yegu07
-                            <img class="player-flag" src="img/flags/españa.png" alt="España">
-                        </h3>
-                        <p class="player-role">Jugador Code Genius</p>
-                        <p class="player-bio">
-                            Humildemente humilde, me gusta respirar
-                        </p>
-                    </div>
-                </article>
-
-                <!-- Player Mauri -->
-                <article class="player-card" data-index="3">
-                    <div class="player-portrait">
-                        <div class="portrait-circle">
-                            <img src="img/mauri.png" alt="Mauri">
-                        </div>
-                    </div>
-                    <div class="player-info">
-                        <h3 class="player-name">Mauri
-                            <img class="player-flag" src="img/flags/chile.png" alt="Chile">
-                        </h3>
-                        <p class="player-role">Jugador Code Genius</p>
-                        <p class="player-bio">
-                            Jugador experimentado, el peor chileno del equipo (hay 2)
-                        </p>
-                    </div>
-                </article>
-
-
-                <!-- Player Krips -->
-                <article class="player-card" data-index="3">
-                    <div class="player-portrait">
-                        <div class="portrait-circle">
-                            <img src="img/krips.png" alt="Krips">
-                        </div>
-                    </div>
-                    <div class="player-info">
-                        <h3 class="player-name">Krips
-                            <img class="player-flag" src="img/flags/venezuela.png" alt="Venezuela">
-                        </h3>
-                        <p class="player-role">Jugador Code Genius</p>
-                        <p class="player-bio">
-                            Lleva compitiendo por mas de 3 años en el mario kart 8 deluxe y ha llegado a finales de
-                            torneos como el paradigm y
-                            finales de varias seasons de MKU, Tu venezolano de confianza, siempre apoyando nunca
-                            decepcionando
-                        </p>
-                        <div class="player-socials">
-                            <a href=" https://www.twitch.tv/kr1ps1207" class="player-social-icon" aria-label="Twitch">
-                                <svg>
-                                    <use href="#icon-twitch"></use>
-                                </svg>
-                            </a>
-                        </div>
-                    </div>
-                </article>
-
-                <!-- Player Tario -->
-                <article class="player-card" data-index="3">
-                    <div class="player-portrait">
-                        <div class="portrait-circle">
-                            <img src="img/tario.png" alt="tario">
-                        </div>
-                    </div>
-                    <div class="player-info">
-                        <h3 class="player-name">Tario
-                            <img class="player-flag" src="img/flags/españa.png" alt="España">
-                        </h3>
-                        <p class="player-role">Jugador Code Genius</p>
-                        <p class="player-bio">
-                            Amante del juego desde día 1, donante solidario de rayos para el equipo contrario.
-                            Filántropo y altruista
-                        </p>
-                    </div>
-                </article>
-            </div>
-            <button class="carousel-arrow next" aria-label="Jugador siguiente">›</button>
-        </div>
-
-        <div class="carousel-dots carousel-dots-team1">
-            <button class="dot active" data-index="0" aria-label="Jugador 1"></button>
-            <button class="dot" data-index="1" aria-label="Jugador 2"></button>
-            <button class="dot" data-index="2" aria-label="Jugador 3"></button>
-            <button class="dot" data-index="3" aria-label="Jugador 4"></button>
-            <button class="dot" data-index="4" aria-label="Jugador 5"></button>
-            <button class="dot" data-index="5" aria-label="Jugador 6"></button>
-            <button class="dot" data-index="6" aria-label="Jugador 7"></button>
-            <button class="dot" data-index="7" aria-label="Jugador 8"></button>
-            <button class="dot" data-index="8" aria-label="Jugador 9"></button>
-            <button class="dot" data-index="9" aria-label="Jugador 10"></button>
-        </div>
-
-
-
-
-        <!-- TITULO EQUIPO SECUNDARIO -->
-        <div class="players-team-heading players-team-heading--team2">
-            <h3 class="players-team-kicker">Code Genesis</h3>
-        </div>
-
-        <!-- CARRUSEL EQUIPO SECUNDARIO (CG2 / Code Genesis) -->
-        <div class="player-carousel player-carousel--team2">
-            <button class="carousel-arrow prev" aria-label="Jugador anterior">‹</button>
-
-            <div class="player-track">
-
-                <!-- Player Peci -->
-                <article class="player-card active" data-index="1">
-                    <div class="player-portrait">
-                        <div class="portrait-circle">
-                            <img src="img/peci.png" alt="Peci">
-                        </div>
-                    </div>
-                    <div class="player-info">
-                        <h3 class="player-name">Peci
-                            <img class="player-flag" src="img/flags/españa.png" alt="España">
-                        </h3>
-                        <p class="player-role">Capitan de Code Genesis</p>
-                        <p class="player-bio">
-                            Code Genesis Leader. One Piece, Inazuma, Mario Kart en ese orden
-                        </p>
-
-                        <div class="player-socials">
-                            <a href="https://twitch.tv/pecii__" class="player-social-icon" aria-label="Twitch">
-                                <svg>
-                                    <use href="#icon-twitch"></use>
-                                </svg>
-                            </a>
-
-                            <a href="https://x.com/jpecii_" class="player-social-icon" aria-label="X">
-                                <svg>
-                                    <use href="#icon-x"></use>
-                                </svg>
-                            </a>
-                            <span class="player-tag">Staff</span>
-                            <span class="player-tag">Capitan</span>
-                        </div>
-                    </div>
-                </article>
-
-                <!-- Player Bamtop -->
-                <article class="player-card active" data-index="0">
-                    <div class="player-portrait">
-                        <div class="portrait-circle">
-                            <img src="img/bamtop.png" alt="Bamtop">
-                        </div>
-                    </div>
-                    <div class="player-info">
-                        <h3 class="player-name">Bamtop
-                            <img class="player-flag" src="img/flags/españa.png" alt="España">
-                        </h3>
-                        <p class="player-role">Capitan de Code Genesis</p>
-                        <p class="player-bio">
-                            Colider de Code Genesis. Andaluz de corazón."Esta es la verdadera fuerza de Alius"
-                        </p>
-                        <span class="player-tag">Staff</span>
-                        <span class="player-tag">Capitan</span>
-                    </div>
-                </article>
-
-                <!-- Player Phoski -->
-                <article class="player-card active" data-index="0">
-                    <div class="player-portrait">
-                        <div class="portrait-circle">
-                            <img src="img/phoski.png" alt="Phoski ">
-                        </div>
-                    </div>
-                    <div class="player-info">
-                        <h3 class="player-name">Phoski
-                            <img class="player-flag" src="img/flags/españa.png" alt="España">
-                        </h3>
-                        <p class="player-role">Jugador Code Genesis</p>
-                        <p class="player-bio">
-                            Jugador vizcaíno-burgales de Code Genesis,
-                            experiencia en divs medias en Mario Kart 8 Deluxe
-                            y ex jugador de Nefrodagetud Rrucfnturl en Mario Kart World
-                        </p>
-                        <div class="player-socials">
-                            <a href="https://www.twitch.tv/phoskii_mk" class="player-social-icon" aria-label="Twitch">
-                                <svg>
-                                    <use href="#icon-twitch"></use>
-                                </svg>
-                            </a>
-
-                            <a href="https://x.com/Phoskiit0" class="player-social-icon" aria-label="X">
-                                <svg>
-                                    <use href="#icon-x"></use>
-                                </svg>
-                            </a>
-                            <a href="https://www.youtube.com/@Phoskii_" class="player-social-icon" aria-label="yt">
-                                <svg>
-                                    <use href="#icon-youtube"></use>
-                                </svg>
-                            </a>
-                        </div>
-                    </div>
-                </article>
-
-                <!-- Player Goose -->
-                <article class="player-card active" data-index="0">
-                    <div class="player-portrait">
-                        <div class="portrait-circle">
-                            <img src="img/goose.png" alt="Goose">
-                        </div>
-                    </div>
-                    <div class="player-info">
-                        <h3 class="player-name">Goose
-                            <img class="player-flag" src="img/flags/españa.png" alt="España">
-                        </h3>
-                        <p class="player-role">Jugador Code Genesis</p>
-                        <p class="player-bio">
-                            Jugador de Code Génesis, persona muy competitiva, exjugador de RK3 Prime y former top 5 en
-                            cielos helados (mi gente)
-                        </p>
-                    </div>
-                </article>
-
-                <!-- Player Daanii -->
-                <article class="player-card active" data-index="0">
-                    <div class="player-portrait">
-                        <div class="portrait-circle">
-                            <img src="img/dani.gif" alt="Daanii">
-                        </div>
-                    </div>
-                    <div class="player-info">
-                        <h3 class="player-name">Daanii
-                            <img class="player-flag" src="img/flags/españa.png" alt="España">
-                        </h3>
-                        <p class="player-role">Jugador Code Genesis</p>
-                        <p class="player-bio">
-                            El mason mas rapido de todos
-                        </p>
-                        <div class="player-socials">
-                            <a href="https://www.twitch.tv/daanii_pp" class="player-social-icon" aria-label="Twitch">
-                                <svg>
-                                    <use href="#icon-twitch"></use>
-                                </svg>
-                            </a>
-                        </div>
-                    </div>
-                </article>
-
-                <!-- Player Dominic -->
-                <article class="player-card active" data-index="0">
-                    <div class="player-portrait">
-                        <div class="portrait-circle">
-                            <img src="img/dominic.gif" alt="Dominic">
-                        </div>
-                    </div>
-                    <div class="player-info">
-                        <h3 class="player-name">Dominic
-                            <img class="player-flag" src="img/flags/españa.png" alt="España">
-                        </h3>
-                        <p class="player-role">Jugador Code Genesis</p>
-                        <p class="player-bio">
-                            Mas sabio que Byron Love, menos manos que un Cheep Cheep
-                        </p>
-                        <div class="player-socials">
-                            <a href="https://www.twitch.tv/dominicmk_" class="player-social-icon" aria-label="Twitch">
-                                <svg>
-                                    <use href="#icon-twitch"></use>
-                                </svg>
-                            </a>
-
-                            <a href="https://x.com/DominicMK_" class="player-social-icon" aria-label="X">
-                                <svg>
-                                    <use href="#icon-x"></use>
-                                </svg>
-                            </a>
-                        </div>
-                    </div>
-                </article>
-
-                <!-- Player Karma -->
-                <article class="player-card active" data-index="0">
-                    <div class="player-portrait">
-                        <div class="portrait-circle">
-                            <img src="img/karma.png" alt="Karma">
-                        </div>
-                    </div>
-                    <div class="player-info">
-                        <h3 class="player-name">Karma
-                            <img class="player-flag" src="img/flags/españa.png" alt="España">
-                        </h3>
-                        <p class="player-role">Jugador Code Genesis</p>
-                        <p class="player-bio">
-                            Jugador Competitivo nuevo en Mario Kart World para Code Genesis, actualmente de los mejores
-                            jugadores de Shy Guy(Somos como 3)
-                        </p>
-                    </div>
-                </article>
-
-
-                <!-- Player Roger -->
-                <article class="player-card active" data-index="0">
-                    <div class="player-portrait">
-                        <div class="portrait-circle">
-                            <img src="img/roger.png" alt="Roger">
-                        </div>
-                    </div>
-                    <div class="player-info">
-                        <h3 class="player-name">Roger
-                            <img class="player-flag" src="img/flags/españa.png" alt="España">
-                        </h3>
-                        <p class="player-role">Jugador Code Genesis</p>
-                        <p class="player-bio">
-                            la rana favorita de Code Genesis, top 5 world record en Castillo Bowser🔥🔥
-                        </p>
-                        <div class="player-socials">
-                            <a href="https://www.twitch.tv/roger_puchi" class="player-social-icon" aria-label="Twitch">
-                                <svg>
-                                    <use href="#icon-twitch"></use>
-                                </svg>
-                            </a>
-                        </div>
-                    </div>
-                </article>
-
-
-                <!-- Player Deivou -->
-                <article class="player-card active" data-index="0">
-                    <div class="player-portrait">
-                        <div class="portrait-circle">
-                            <img src="img/deivou.png" alt="Deivou">
-                        </div>
-                    </div>
-                    <div class="player-info">
-                        <h3 class="player-name">Deivou
-                            <img class="player-flag" src="img/flags/españa.png" alt="España">
-                        </h3>
-                        <p class="player-role">Jugador Code Genesis</p>
-                        <p class="player-bio">
-                            Velocidad. Soy rápido, más que rápido, soy veloz. Soy un Rayo ⚡
-                        </p>
-                        <div class="player-socials">
-                            <a href="https://www.twitch.tv/deiivouu" class="player-social-icon" aria-label="Twitch">
-                                <svg>
-                                    <use href="#icon-twitch"></use>
-                                </svg>
-                            </a>
-                        </div>
-                    </div>
-                </article>
-
-
-
-                <!-- Player Monkey -->
-                <article class="player-card active" data-index="0">
-                    <div class="player-portrait">
-                        <div class="portrait-circle">
-                            <img src="img/monkey.png" alt="Monkey">
-                        </div>
-                    </div>
-                    <div class="player-info">
-                        <h3 class="player-name">Monkey
-                            <img class="player-flag" src="img/flags/venezuela.png" alt="Venezuela">
-                        </h3>
-                        <p class="player-role">Jugador Code Genesis</p>
-                        <p class="player-bio">
-                            jugador Venezolano-Gallego, ex miembro de Nefrodagetud rrucfnturl (.dev), rey de los fungis
-                        </p>
-                    </div>
-                </article>
-
-
-                <!-- Player Deku -->
-                <article class="player-card active" data-index="0">
-                    <div class="player-portrait">
-                        <div class="portrait-circle">
-                            <img src="img/deku.png" alt="deku">
-                        </div>
-                    </div>
-                    <div class="player-info">
-                        <h3 class="player-name">Deku
-                            <img class="player-flag" src="img/flags/españa.png" alt="España">
-                        </h3>
-                        <p class="player-role">Jugador Code Genesis</p>
-                        <p class="player-bio">
-                            Jugador de Code Génesis, experiencia en divs altas (2-3) y exjugador de RK2 en Mario Kart
-                            World (me gustan los cachopos)
-                        </p>
-                        <div class="player-socials">
-                            <a href="https://youtube.com/@deku957?si=P8z1kohtfC6N8J5k" class="player-social-icon"
-                                aria-label="YouTube">
-                                <svg>
-                                    <use href="#icon-youtube"></use>
-                                </svg>
-                            </a>
-                        </div>
-                    </div>
-                </article>
-
-
-                <!-- Player Jorgitum -->
-                <article class="player-card active" data-index="0">
-                    <div class="player-portrait">
-                        <div class="portrait-circle">
-                            <img src="img/jorgitum.png" alt="Jorgitum">
-                        </div>
-                    </div>
-                    <div class="player-info">
-                        <h3 class="player-name">Jorgitum
-                            <img class="player-flag" src="img/flags/españa.png" alt="España">
-                        </h3>
-                        <p class="player-role">Jugador Code Genesis</p>
-                        <p class="player-bio">
-                            Jugador petit de mariano karricoches. Viva el pan con chicharrón
-                        </p>
-                    </div>
-                </article>
-
-                <!-- Player Croqueta -->
-                <article class="player-card active" data-index="0">
-                    <div class="player-portrait">
-                        <div class="portrait-circle">
-                            <img src="img/croqueta.png" alt="Croqueta">
-                        </div>
-                    </div>
-                    <div class="player-info">
-                        <h3 class="player-name">Croqueta
-                            <img class="player-flag" src="img/flags/españa.png" alt="España">
-                        </h3>
-                        <p class="player-role">Jugador Code Genesis</p>
-                        <p class="player-bio">
-                            fungi lover, un experto en croquetas
-                        </p>
-                    </div>
-                </article>
-            </div>
-
-            <button class="carousel-arrow next" aria-label="Jugador siguiente">›</button>
-        </div>
-
-        <div class="carousel-dots carousel-dots-team2">
-            <button class="dot active" data-index="0" aria-label="Jugador 1"></button>
-            <button class="dot" data-index="1" aria-label="Jugador 2"></button>
-            <button class="dot" data-index="2" aria-label="Jugador 3"></button>
-            <button class="dot" data-index="3" aria-label="Jugador 4"></button>
-            <button class="dot" data-index="4" aria-label="Jugador 5"></button>
-            <button class="dot" data-index="5" aria-label="Jugador 6"></button>
-            <button class="dot" data-index="6" aria-label="Jugador 7"></button>
-            <button class="dot" data-index="7" aria-label="Jugador 8"></button>
-            <button class="dot" data-index="8" aria-label="Jugador 9"></button>
-            <button class="dot" data-index="9" aria-label="Jugador 10"></button>
-            <button class="dot" data-index="10" aria-label="Jugador 11"></button>
-            <button class="dot" data-index="11" aria-label="Jugador 12"></button>
-            <button class="dot" data-index="12" aria-label="Jugador 13"></button>
-        </div>
-    </section>
-
-    <!-- FOOTER -->
-    <footer>
-        © <span id="year"></span> Code Genius eSports · Mario Kart Club
-    </footer>
-
-    <script>
-        // Año footer
-        document.getElementById('year').textContent = new Date().getFullYear();
-
-        // Carrusel de jugadores
-        function setupPlayerCarousel(carouselSelector, dotsSelector) {
-            const carousel = document.querySelector(carouselSelector);
-            const dotsContainer = document.querySelector(dotsSelector);
-
-            if (!carousel || !dotsContainer) return;
-
-            const track = carousel.querySelector('.player-track');
-            const cards = Array.from(carousel.querySelectorAll('.player-card'));
-            const prevBtn = carousel.querySelector('.carousel-arrow.prev');
-            const nextBtn = carousel.querySelector('.carousel-arrow.next');
-            const dots = Array.from(dotsContainer.querySelectorAll('.dot'));
-
-            if (!track || cards.length === 0 || !prevBtn || !nextBtn || dots.length === 0) return;
-
-            let currentIndex = 0;
-
-            function updateCarousel(index) {
-                track.style.transform = `translateX(-${index * 100}%)`;
-
-                cards.forEach((card, i) => {
-                    card.classList.toggle('active', i === index);
-                });
-
-                dots.forEach((dot, i) => {
-                    dot.classList.toggle('active', i === index);
-                });
-            }
-
-            updateCarousel(currentIndex);
-
-            prevBtn.addEventListener('click', () => {
-                currentIndex = (currentIndex - 1 + cards.length) % cards.length;
-                updateCarousel(currentIndex);
-            });
-
-            nextBtn.addEventListener('click', () => {
-                currentIndex = (currentIndex + 1) % cards.length;
-                updateCarousel(currentIndex);
-            });
-
-            dots.forEach((dot, idx) => {
-                dot.addEventListener('click', () => {
-                    currentIndex = idx;
-                    updateCarousel(currentIndex);
-                });
-            });
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BRACKET -->
+  <div class="panel" id="panel-bracket">
+    <div class="sh"><span class="sh-title" data-i18n="tab_bracket">Tournament Bracket</span><span class="sh-badge" id="bracket-badge">—</span></div>
+    <div id="bracket-root"><div class="empty"><div class="spin"></div><div class="empty-title" data-i18n="loading">Loading…</div></div></div>
+  </div>
+
+  <div class="panel" id="panel-teams">
+    <div id="myzone-root"></div>
+    <div class="sh"><span class="sh-title" data-i18n="teams_title">Participating Teams</span><span class="sh-badge" id="teams-badge">—</span></div>
+    <div class="teams-grid" id="teams-root"><div class="empty" style="grid-column:1/-1"><div class="spin"></div><div class="empty-title" data-i18n="loading">Loading…</div></div></div>
+  </div>
+
+  <div class="panel" id="panel-matches">
+    <div class="sh"><span class="sh-title" data-i18n="tab_matches">Matches</span></div>
+    <div class="round-filter" id="round-filter"></div>
+    <div class="matches-list" id="matches-root"><div class="empty"><div class="spin"></div><div class="empty-title" data-i18n="loading">Loading…</div></div></div>
+  </div>
+
+  <div class="panel" id="panel-standings">
+    <div class="sh"><span class="sh-title" data-i18n="tab_standings">Standings</span><span class="sh-badge" id="standings-badge">—</span></div>
+    <div id="standings-root"><div class="empty"><div class="spin"></div><div class="empty-title" data-i18n="loading">Loading…</div></div></div>
+  </div>
+</div>
+
+<!-- MODAL: AUTH -->
+<div class="ov" id="ov-auth" onclick="closeBg(event,'ov-auth')">
+  <div class="modal">
+    <div class="mhead"><div class="mtitle" id="auth-title" data-i18n="signin">Sign In</div><button class="mx" onclick="closeOv('ov-auth')">✕</button></div>
+    <div class="mbody">
+      <div class="mtabs">
+        <button class="mtab on" id="mt-login" onclick="authTab('login')" data-i18n="signin">Sign In</button>
+        <button class="mtab"    id="mt-reg"   onclick="authTab('register')" data-i18n="register">Create Account</button>
+      </div>
+      <div id="f-login">
+        <div class="ferr" id="l-err"></div><div class="fok" id="l-ok"></div>
+        <div class="fg"><label class="fl" data-i18n="email">Email</label><input class="fi" id="l-email" type="email" placeholder="you@email.com"></div>
+        <div class="fg"><label class="fl" data-i18n="password">Password</label><input class="fi" id="l-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+        <button class="fsub" id="btn-login" onclick="doLogin()" data-i18n="signin">Sign In</button>
+      </div>
+      <div id="f-reg" style="display:none">
+        <div class="ferr" id="r-err"></div><div class="fok" id="r-ok"></div>
+        <div class="fg"><label class="fl" data-i18n="username">Username</label><input class="fi" id="r-user" type="text" placeholder="YourUsername"></div>
+        <div class="fg"><label class="fl" data-i18n="email">Email</label><input class="fi" id="r-email" type="email" placeholder="you@email.com"></div>
+        <div class="fg"><label class="fl" data-i18n="password">Password</label><input class="fi" id="r-pass" type="password" placeholder="At least 6 characters" onkeydown="if(event.key==='Enter')doRegister()"></div>
+        <button class="fsub" id="btn-reg" onclick="doRegister()" data-i18n="register">Create Account</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: CREATE TEAM -->
+<div class="ov" id="ov-cteam" onclick="closeBg(event,'ov-cteam')">
+  <div class="modal">
+    <div class="mhead"><div class="mtitle" data-i18n="create_team">Create Team</div><button class="mx" onclick="closeOv('ov-cteam')">✕</button></div>
+    <div class="mbody">
+      <div class="ferr" id="ct-err"></div><div class="fok" id="ct-ok"></div>
+      <div class="fg"><label class="fl" data-i18n="team_name">Team Name</label><input class="fi" id="ct-name" type="text" placeholder="e.g. Code Genius"></div>
+      <div class="fg"><label class="fl">Tag <span style="font-weight:400;letter-spacing:0;text-transform:none;font-family:var(--body)" data-i18n="tag_hint">(max 15 chars)</span></label><input class="fi" id="ct-tag" type="text" placeholder="CG" maxlength="15"></div>
+      <div class="fg"><label class="fl" data-i18n="description_opt">Description (optional)</label><input class="fi" id="ct-desc" type="text" placeholder="Short team description"></div>
+      <button class="fsub" id="btn-ct" onclick="doCreateTeam()" data-i18n="create_team">Create Team</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: ENROLL -->
+<div class="ov" id="ov-enroll" onclick="closeBg(event,'ov-enroll')">
+  <div class="modal">
+    <div class="mhead"><div class="mtitle" data-i18n="enroll_title">Enroll in Tournament</div><button class="mx" onclick="closeOv('ov-enroll')">✕</button></div>
+    <div class="mbody">
+      <div class="ferr" id="en-err"></div><div class="fok" id="en-ok"></div>
+      <div class="ibox"><div class="ibox-l" data-i18n="tournament">Tournament</div><div class="ibox-v" id="en-tour">—</div></div>
+      <div class="ibox"><div class="ibox-l" data-i18n="your_team">Your Team</div><div class="ibox-v" id="en-team">—</div></div>
+      <p style="font-size:12px;color:var(--t3);margin-bottom:18px;line-height:1.7" data-i18n="enroll_note">By enrolling your team you confirm all members will be available for scheduled matches. Registration will be reviewed by an admin.</p>
+      <button class="fsub" id="btn-en" onclick="doEnroll()" data-i18n="confirm_enroll">Confirm Enrollment</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: MANAGE TEAM -->
+<div class="ov" id="ov-team" onclick="closeBg(event,'ov-team')">
+  <div class="modal">
+    <div class="mhead"><div class="mtitle" data-i18n="manage_team">Manage Team</div><button class="mx" onclick="closeOv('ov-team')">✕</button></div>
+    <div class="mbody">
+      <div class="ibox"><div class="ibox-l" data-i18n="team_lbl">Team</div><div class="ibox-v" id="tm-name">—</div></div>
+      <div class="ferr" id="am-err"></div><div class="fok" id="am-ok"></div>
+      <div class="fg">
+        <label class="fl" data-i18n="add_member_lbl">Add member by User ID</label>
+        <input class="fi" id="am-uid" type="text" placeholder="Paste the player's User ID" onkeydown="if(event.key==='Enter')doAddMember()">
+        <div class="fi-hint" data-i18n="add_member_hint">Players can find their ID by clicking their username in the nav bar. Only the team owner can add members.</div>
+      </div>
+      <button class="fsub" id="btn-am" onclick="doAddMember()" style="margin-bottom:18px" data-i18n="add_member_btn">Add Member</button>
+      <div style="font-family:var(--head);font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);margin-bottom:10px" data-i18n="current_members">Current Members</div>
+      <div class="members-list" id="members-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: PROFILE -->
+<div class="ov" id="ov-profile" onclick="closeBg(event,'ov-profile')">
+  <div class="modal">
+    <div class="mhead"><div class="mtitle" data-i18n="my_profile">My Profile</div><button class="mx" onclick="closeOv('ov-profile')">✕</button></div>
+    <div class="mbody">
+      <div class="ibox"><div class="ibox-l" data-i18n="username">Username</div><div class="ibox-v" id="prof-username">—</div></div>
+      <div class="ibox">
+        <div class="ibox-l">User ID <span style="font-weight:400;letter-spacing:0;text-transform:none;font-family:var(--body);font-size:10px" data-i18n="uid_hint">(share with your captain to join a team)</span></div>
+        <div class="ibox-v" id="prof-id" style="font-size:11px;word-break:break-all;color:var(--cyan);text-shadow:0 0 10px var(--cglow)">—</div>
+      </div>
+      <div class="ibox"><div class="ibox-l" data-i18n="role">Role</div><div class="ibox-v" id="prof-role">—</div></div>
+      <button class="fsub" onclick="closeOv('ov-profile')" style="background:var(--bg4);box-shadow:none;color:var(--t2)" data-i18n="close">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ── LAUNCH GATE — redirect to coming-soon if before May 8 2025 00:00 ── */
+(function(){
+  const LAUNCH = new Date('2025-05-08T00:00:00');
+  if(new Date() < LAUNCH) window.location.replace('coming-soon.html');
+})();
+
+/* ═══════════════════════════════════
+   i18n — EN / ES
+═══════════════════════════════════ */
+const T={
+  en:{
+    tab_info:'Info', tab_bracket:'Bracket', tab_teams:'Teams',
+    tab_matches:'Matches', tab_standings:'Standings',
+    stat_teams:'Teams', stat_rounds:'Rounds', stat_matches:'Matches',
+    loading:'Loading…', err_conn:'⚠ Could not connect to server.',
+    info_title:'How it works', info_badge:'Getting started',
+    s1_title:'Create your account',
+    s1_body:'Click <strong style="color:var(--t1)">Register</strong> in the top right corner. Choose a username, enter your email and a password of at least 6 characters.',
+    s1_note_title:'Your User ID',
+    s1_note_body:'Once logged in, click your username (top right) to see your <strong style="color:var(--cyan)">User ID</strong>. Share it with your captain so they can add you to the team.',
+    s2_title:'Create your team',
+    s2_body:'Go to the <strong style="color:var(--t1)">Teams</strong> tab and click <strong style="color:var(--t1)">+ Create Team</strong>. Pick a name and a short tag (e.g. <span style="font-family:var(--head);color:var(--cyan);font-size:13px">CG</span>). You become the team captain.',
+    s2_note_title:'One team per player',
+    s2_note_body:'Each account can only belong to one team at a time.',
+    s3_title:'Add your players',
+    s3_body:'Each teammate must create their own account first and share their User ID with you. As captain, click <strong style="color:var(--t1)">Manage Team</strong> in the Teams tab and paste each player\'s User ID.',
+    s3_note_title:'Captain only',
+    s3_note_body:'Only the team Owner can add or remove players.',
+    s4_title:'Enroll in the tournament',
+    s4_body:'Once your team is ready, click <strong style="color:var(--t1)">Enroll in Tournament</strong> in the Teams tab. The admin will review and approve your request. Once approved you\'ll appear in the bracket.',
+    s4_note_title:'Registration must be open',
+    s4_note_body:'Enrollment only works when the tournament status is <span style="font-family:var(--head);color:var(--cyan);font-size:12px">OPEN</span>.',
+    teams_title:'Participating Teams',
+    signin:'Sign In', register:'Create Account',
+    email:'Email', password:'Password', username:'Username',
+    create_team:'Create Team', team_name:'Team Name',
+    tag_hint:'(max 15 chars)', description_opt:'Description (optional)',
+    enroll_title:'Enroll in Tournament', tournament:'Tournament',
+    your_team:'Your Team',
+    enroll_note:'By enrolling your team you confirm all members will be available for scheduled matches. Registration will be reviewed by an admin.',
+    confirm_enroll:'Confirm Enrollment',
+    manage_team:'Manage Team', team_lbl:'Team',
+    add_member_lbl:'Add member by User ID',
+    add_member_hint:'Players can find their ID by clicking their username in the nav bar. Only the team owner can add members.',
+    add_member_btn:'Add Member', current_members:'Current Members',
+    my_profile:'My Profile', uid_hint:'(share with your captain to join a team)',
+    role:'Role', close:'Close',
+    nav_signin:'Sign In', nav_register:'Register', nav_signout:'Sign Out',
+    nav_admin:'Admin',
+    mz_no_team:'You don\'t have a team yet. Create one to enroll in the tournament.',
+    mz_create:'+ Create Team', mz_manage:'Manage Team',
+    mz_enroll:'Enroll in Tournament', mz_enrolled:'✓ Enrolled',
+    mz_members:'Members', mz_played:'Played', mz_wins:'Wins',
+    st_played:'Played', st_wins:'Wins', st_wr:'WR',
+    mr_live:'live', mr_finished:'finished', mr_pending:'pending',
+    bracket_tbd:'TBD', bracket_champion:'Champion',
+    empty_bracket:'Bracket Not Available Yet',
+    empty_bracket_sub:'Rounds will appear here once the tournament starts',
+    empty_teams:'No Approved Teams Yet',
+    empty_matches:'No Matches Scheduled Yet',
+    empty_standings:'No Standings Yet',
+    status_open:'Registration Open', status_closed:'Registration Closed',
+    status_progress:'Tournament Live', status_finished:'Tournament Finished',
+  },
+  es:{
+    tab_info:'Info', tab_bracket:'Bracket', tab_teams:'Equipos',
+    tab_matches:'Partidos', tab_standings:'Clasificación',
+    stat_teams:'Equipos', stat_rounds:'Rondas', stat_matches:'Partidos',
+    loading:'Cargando…', err_conn:'⚠ No se pudo conectar al servidor.',
+    info_title:'Cómo funciona', info_badge:'Primeros pasos',
+    s1_title:'Crea tu cuenta',
+    s1_body:'Haz clic en <strong style="color:var(--t1)">Registrarse</strong> en la esquina superior derecha. Elige un nombre de usuario, introduce tu email y una contraseña de al menos 6 caracteres.',
+    s1_note_title:'Tu User ID',
+    s1_note_body:'Una vez conectado, haz clic en tu nombre (arriba a la derecha) para ver tu <strong style="color:var(--cyan)">User ID</strong>. Compártelo con tu capitán para que te añada al equipo.',
+    s2_title:'Crea tu equipo',
+    s2_body:'Ve a la pestaña <strong style="color:var(--t1)">Equipos</strong> y haz clic en <strong style="color:var(--t1)">+ Crear Equipo</strong>. Elige un nombre y un tag corto (p.ej. <span style="font-family:var(--head);color:var(--cyan);font-size:13px">CG</span>). Pasas a ser el capitán.',
+    s2_note_title:'Un equipo por jugador',
+    s2_note_body:'Cada cuenta solo puede pertenecer a un equipo a la vez.',
+    s3_title:'Añade a tus jugadores',
+    s3_body:'Cada compañero debe crear su propia cuenta primero y compartir su User ID contigo. Como capitán, haz clic en <strong style="color:var(--t1)">Gestionar Equipo</strong> en la pestaña Equipos y pega el User ID de cada jugador.',
+    s3_note_title:'Solo el capitán',
+    s3_note_body:'Solo el Owner del equipo puede añadir o eliminar jugadores.',
+    s4_title:'Inscríbete al torneo',
+    s4_body:'Cuando tu equipo esté listo, haz clic en <strong style="color:var(--t1)">Inscribir al Torneo</strong> en la pestaña Equipos. El admin revisará y aprobará tu solicitud. Una vez aprobado apareceréis en el bracket.',
+    s4_note_title:'El registro debe estar abierto',
+    s4_note_body:'La inscripción solo funciona cuando el estado del torneo es <span style="font-family:var(--head);color:var(--cyan);font-size:12px">OPEN</span>.',
+    teams_title:'Equipos Participantes',
+    signin:'Iniciar Sesión', register:'Crear Cuenta',
+    email:'Email', password:'Contraseña', username:'Nombre de usuario',
+    create_team:'Crear Equipo', team_name:'Nombre del Equipo',
+    tag_hint:'(máx 15 caracteres)', description_opt:'Descripción (opcional)',
+    enroll_title:'Inscribirse al Torneo', tournament:'Torneo',
+    your_team:'Tu Equipo',
+    enroll_note:'Al inscribir tu equipo confirmas que todos los miembros estarán disponibles para los partidos programados. La inscripción será revisada por un admin.',
+    confirm_enroll:'Confirmar Inscripción',
+    manage_team:'Gestionar Equipo', team_lbl:'Equipo',
+    add_member_lbl:'Añadir miembro por User ID',
+    add_member_hint:'Los jugadores encuentran su ID haciendo clic en su nombre en la barra de navegación. Solo el capitán puede añadir miembros.',
+    add_member_btn:'Añadir Miembro', current_members:'Miembros Actuales',
+    my_profile:'Mi Perfil', uid_hint:'(compártelo con tu capitán para unirte a un equipo)',
+    role:'Rol', close:'Cerrar',
+    nav_signin:'Iniciar Sesión', nav_register:'Registrarse', nav_signout:'Cerrar Sesión',
+    nav_admin:'Admin',
+    mz_no_team:'Aún no tienes equipo. Crea uno para inscribirte al torneo.',
+    mz_create:'+ Crear Equipo', mz_manage:'Gestionar Equipo',
+    mz_enroll:'Inscribir al Torneo', mz_enrolled:'✓ Inscrito',
+    mz_members:'Miembros', mz_played:'Jugados', mz_wins:'Victorias',
+    st_played:'Jugados', st_wins:'V', st_wr:'%V',
+    mr_live:'en directo', mr_finished:'finalizado', mr_pending:'pendiente',
+    bracket_tbd:'Por definir', bracket_champion:'Campeón',
+    empty_bracket:'Bracket No Disponible',
+    empty_bracket_sub:'Las rondas aparecerán aquí cuando empiece el torneo',
+    empty_teams:'Aún no hay equipos aprobados',
+    empty_matches:'No hay partidos programados',
+    empty_standings:'Sin clasificación aún',
+    status_open:'Inscripciones abiertas', status_closed:'Inscripciones cerradas',
+    status_progress:'Torneo en curso', status_finished:'Torneo finalizado',
+  }
+};
+
+let LANG = localStorage.getItem('gc_lang')||'en';
+
+function t(k){ return (T[LANG]||T.en)[k]||T.en[k]||k; }
+
+function applyLang(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k=el.getAttribute('data-i18n');
+    el.innerHTML=t(k);
+  });
+  document.documentElement.lang=LANG;
+  const btn=document.getElementById('lang-btn');
+  if(btn) btn.textContent=LANG==='es'?'EN':'ES';
+}
+
+function toggleLang(){
+  LANG=LANG==='es'?'en':'es';
+  localStorage.setItem('gc_lang',LANG);
+  applyLang();
+  renderNav();
+  renderMyZone();
+  if(S.pubView) renderAll();
+}
+
+/* lang button style injected into nav-right by renderNav */
+/* ── CANVAS: conexiones estilo Code Genius ── */
+(function(){
+  const c=document.getElementById('bg'),ctx=c.getContext('2d');
+  let W,H,pts=[];
+  const COLORS=['rgba(30,111,255,','rgba(0,212,255,','rgba(30,111,255,'];
+  function resize(){W=c.width=innerWidth;H=c.height=innerHeight}
+  function init(){
+    pts=[];
+    const n=Math.floor(W*H/14000);
+    for(let i=0;i<n;i++)
+      pts.push({
+        x:Math.random()*W, y:Math.random()*H,
+        vx:(Math.random()-.5)*.3, vy:(Math.random()-.5)*.3,
+        r:Math.random()*1.5+.5,
+        a:Math.random()*.6+.2,
+        col:COLORS[Math.floor(Math.random()*COLORS.length)]
+      });
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    /* connections first */
+    for(let i=0;i<pts.length;i++){
+      for(let j=i+1;j<pts.length;j++){
+        const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y;
+        const d=Math.sqrt(dx*dx+dy*dy);
+        if(d<120){
+          const a=.08*(1-d/120);
+          ctx.beginPath();
+          ctx.moveTo(pts[i].x,pts[i].y);
+          ctx.lineTo(pts[j].x,pts[j].y);
+          ctx.strokeStyle=`rgba(30,111,255,${a})`;
+          ctx.lineWidth=.6; ctx.stroke();
         }
+      }
+    }
+    /* dots */
+    pts.forEach(p=>{
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=p.col+p.a+')'; ctx.fill();
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0||p.x>W)p.vx*=-1;
+      if(p.y<0||p.y>H)p.vy*=-1;
+    });
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize',()=>{resize();init()});
+  resize();init();draw();
+})();
 
-        setupPlayerCarousel('.player-carousel--team1', '.carousel-dots-team1');
-        setupPlayerCarousel('.player-carousel--team2', '.carousel-dots-team2');
+/* ════════════════════════
+   CONFIG & STATE
+════════════════════════ */
+const API='https://backend-mk-grand-circuit.vercel.app';
+const S={user:null,myTeam:null,enrolled:false,tournament:null,pubView:null,rounds:[],teams:[],matches:[],roundFilter:null};
 
+(function(){ try{ const u=localStorage.getItem('mkgc_u'); if(u)S.user=JSON.parse(u); }catch(e){} })();
+function saveS(){ if(S.user) localStorage.setItem('mkgc_u',JSON.stringify(S.user)); }
+function killS(){ localStorage.removeItem('mkgc_u'); S.user=null; S.myTeam=null; S.enrolled=false; }
 
-        // PARALLAX DEL LOGO ESPACIAL
-        const spaceBanner = document.querySelector('.space-banner');
-        const spaceLogo = document.querySelector('.space-logo-big');
+async function api(path,opts={}){
+  const h={'Content-Type':'application/json',...opts.headers};
+  if(S.user?.token) h['Authorization']='Bearer '+S.user.token;
+  const r=await fetch(API+path,{...opts,headers:h});
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok) throw Object.assign(new Error(d.error||d.message||'HTTP '+r.status),{status:r.status,data:d});
+  return d;
+}
 
-        function updateSpaceParallax() {
-            if (!spaceBanner || !spaceLogo) return;
+const ini=(n='?')=>(n||'?').split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase().slice(0,3)||'?';
+function setBtn(id,l,fb=''){ const b=document.getElementById(id); if(!b)return; b.disabled=l; if(l)b.dataset.o=b.textContent; b.textContent=l?'…':(fb||b.dataset.o); }
+function msg(id,type,text){ const el=document.getElementById(id); if(!el)return; el.textContent=text; el.className=(type==='err'?'ferr':'fok')+(text?' on':''); }
+function clr(...ids){ ids.forEach(id=>msg(id,'err','')); }
+function toast(text,type='ok'){ const el=document.getElementById('toast'); el.textContent=text; el.className='toast on '+type; setTimeout(()=>el.classList.remove('on'),3200); }
+function openOv(id){ document.getElementById(id).classList.add('on'); }
+function closeOv(id){ document.getElementById(id).classList.remove('on'); }
+function closeBg(e,id){ if(e.target===e.currentTarget)closeOv(id); }
 
-            const rect = spaceBanner.getBoundingClientRect();
-            const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+function gotoTab(name){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.ntab').forEach(b=>b.classList.remove('on'));
+  document.getElementById('panel-'+name).classList.add('on');
+  document.querySelectorAll('.ntab')[['info','bracket','teams','matches','standings'].indexOf(name)]?.classList.add('on');
+}
 
-            const sectionCenter = rect.top + rect.height / 2;
-            const fromCenter = sectionCenter - windowHeight / 2;
+function renderNav(){
+  const el=document.getElementById('nav-right');
+  const langBtn=`<button id="lang-btn" onclick="toggleLang()" style="padding:5px 12px;border-radius:3px;font-family:var(--head);font-size:10px;font-weight:700;letter-spacing:.1em;border:1px solid var(--br2);background:transparent;color:var(--cyan);cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--cyan)'" onmouseout="this.style.borderColor='var(--br2)'">${LANG==='es'?'EN':'ES'}</button>`;
+  const lb=`<div class="live-badge" id="live-badge" style="display:none"><div class="live-dot"></div>LIVE</div>`;
+  if(!S.user){
+    el.innerHTML=`${lb}${langBtn}
+      <button class="nb" onclick="openOv('ov-auth');authTab('login')">${t('nav_signin')}</button>
+      <button class="nb nb-blue" onclick="openOv('ov-auth');authTab('register')">${t('nav_register')}</button>`;
+  } else {
+    const isAdmin=S.user.role==='ADMIN';
+    el.innerHTML=`${lb}${langBtn}
+      ${isAdmin?`<a href="admin.html"><button class="nb" style="color:var(--cyan);border-color:rgba(0,212,255,.4)">⚙ ${t('nav_admin')}</button></a>`:''}
+      <div class="user-chip" onclick="openProfile()">
+        <div class="ava">${ini(S.user.username)}</div>
+        <span class="uname">${S.user.username}</span>
+      </div>
+      <button class="nb" onclick="doLogout()">${t('nav_signout')}</button>`;
+  }
+}
 
-            const parallaxOffset = fromCenter * -0.3;
+function openProfile(){
+  document.getElementById('prof-username').textContent=S.user.username;
+  document.getElementById('prof-id').textContent=S.user.id;
+  document.getElementById('prof-role').textContent=S.user.role;
+  openOv('ov-profile');
+}
 
-            spaceLogo.style.transform = `translateY(${parallaxOffset}px)`;
-        }
+/* ── AUTH ── */
+function authTab(t){
+  document.getElementById('f-login').style.display=t==='login'?'block':'none';
+  document.getElementById('f-reg').style.display=t==='register'?'block':'none';
+  document.getElementById('mt-login').classList.toggle('on',t==='login');
+  document.getElementById('mt-reg').classList.toggle('on',t==='register');
+  document.getElementById('auth-title').textContent=t==='login'?'Sign In':'Create Account';
+  clr('l-err','l-ok','r-err','r-ok');
+}
 
-        window.addEventListener('scroll', updateSpaceParallax);
-        window.addEventListener('load', updateSpaceParallax);
+async function doLogin(){
+  clr('l-err','l-ok');
+  const email=document.getElementById('l-email').value.trim();
+  const password=document.getElementById('l-pass').value;
+  if(!email||!password) return msg('l-err','err','Please fill in all fields.');
+  setBtn('btn-login',true);
+  try{
+    const d=await api('/auth/login',{method:'POST',body:JSON.stringify({email,password})});
+    S.user={id:d.user.id,username:d.user.username,role:d.user.role,token:d.token};
+    saveS(); closeOv('ov-auth'); renderNav();
+    await loadMyTeam(); renderMyZone();
+    toast('Welcome back, '+S.user.username+'!');
+  }catch(e){ msg('l-err','err',e.status===401?'Invalid email or password.':e.message||'Login failed.'); }
+  finally{ setBtn('btn-login',false,'Sign In'); }
+}
 
-        // iluminar tarjetas de calendario
-        const matchCards = document.querySelectorAll('.match-card');
-        const socialCards = document.querySelectorAll('.social-card');
+async function doRegister(){
+  clr('r-err','r-ok');
+  const username=document.getElementById('r-user').value.trim();
+  const email=document.getElementById('r-email').value.trim();
+  const password=document.getElementById('r-pass').value;
+  if(!username||!email||!password) return msg('r-err','err','Please fill in all fields.');
+  if(password.length<6) return msg('r-err','err','Password must be at least 6 characters.');
+  setBtn('btn-reg',true);
+  try{
+    await api('/auth/register',{method:'POST',body:JSON.stringify({username,email,password})});
+    msg('r-ok','ok','Account created! You can now sign in.');
+    setTimeout(()=>authTab('login'),1500);
+  }catch(e){ msg('r-err','err',e.status===409?'Username or email already taken.':e.message||'Registration failed.'); }
+  finally{ setBtn('btn-reg',false,'Create Account'); }
+}
 
-        function setupSelectableCards(cards) {
-            if (!cards || cards.length === 0) return;
+function doLogout(){ killS(); renderNav(); renderMyZone(); toast('Signed out'); }
 
-            cards.forEach(card => {
-                card.addEventListener('click', () => {
-                    const wasSelected = card.classList.contains('is-selected');
+/* ── CREATE TEAM ── */
+async function doCreateTeam(){
+  clr('ct-err','ct-ok');
+  const name=document.getElementById('ct-name').value.trim();
+  const tag=document.getElementById('ct-tag').value.trim();
+  const description=document.getElementById('ct-desc').value.trim();
+  if(!name) return msg('ct-err','err','Team name is required.');
+  if(!tag)  return msg('ct-err','err','Tag is required (e.g. CG).');
+  setBtn('btn-ct',true);
+  try{
+    const body={name,tag}; if(description) body.description=description;
+    const d=await api('/teams',{method:'POST',body:JSON.stringify(body)});
+    S.myTeam=d;
+    msg('ct-ok','ok','Team "'+name+'" created!');
+    setTimeout(async()=>{ closeOv('ov-cteam'); await loadMyTeam(); renderMyZone(); if(S.pubView)renderTeams(); },1200);
+  }catch(e){ msg('ct-err','err',e.status===409?'That team name or tag is already taken.':e.message||'Could not create team.'); }
+  finally{ setBtn('btn-ct',false,'Create Team'); }
+}
 
-                    cards.forEach(c => c.classList.remove('is-selected'));
+/* ── ENROLL ── */
+function openEnroll(){
+  if(!S.tournament||!S.myTeam) return;
+  document.getElementById('en-tour').textContent=S.tournament.name;
+  document.getElementById('en-team').textContent=S.myTeam.name;
+  clr('en-err','en-ok'); openOv('ov-enroll');
+}
+async function doEnroll(){
+  clr('en-err','en-ok'); setBtn('btn-en',true);
+  try{
+    await api(`/tournaments/${S.tournament.id}/register`,{method:'POST',body:JSON.stringify({teamId:S.myTeam.id})});
+    S.enrolled=true;
+    msg('en-ok','ok','Enrollment submitted! Awaiting admin approval.');
+    setTimeout(()=>{ closeOv('ov-enroll'); renderMyZone(); },1200);
+    toast('Enrollment submitted ✓');
+  }catch(e){ msg('en-err','err',e.status===409?'Your team is already enrolled or the tournament is closed.':e.message||'Enrollment failed.'); }
+  finally{ setBtn('btn-en',false,'Confirm Enrollment'); }
+}
 
-                    if (!wasSelected) {
-                        card.classList.add('is-selected');
-                    }
-                });
-            });
-        }
+/* ── MEMBERS ── */
+async function doAddMember(){
+  clr('am-err','am-ok');
+  const userId=document.getElementById('am-uid').value.trim();
+  if(!userId) return msg('am-err','err','Paste the player\'s User ID.');
+  if(!S.myTeam) return msg('am-err','err','You don\'t have a team.');
+  setBtn('btn-am',true);
+  try{
+    await api(`/teams/${S.myTeam.id}/members`,{method:'POST',body:JSON.stringify({userId})});
+    msg('am-ok','ok','Member added successfully.');
+    document.getElementById('am-uid').value='';
+    await loadMyTeam(); renderMembersList(); toast('Member added!');
+  }catch(e){
+    const txt=e.status===409?'That player is already on a team.':e.status===404?'User not found. Check the ID.':e.status===403?'Only the team owner can add members.':e.message||'Could not add member.';
+    msg('am-err','err',txt);
+  }finally{ setBtn('btn-am',false,'Add Member'); }
+}
 
+async function doRemoveMember(userId){
+  if(!confirm('Remove this member from the team?')) return;
+  try{
+    await api(`/teams/${S.myTeam.id}/members/${userId}`,{method:'DELETE'});
+    toast('Member removed'); await loadMyTeam(); renderMembersList();
+  }catch(e){ toast(e.message||'Could not remove member.','err'); }
+}
 
-        setupSelectableCards(matchCards);
-        setupSelectableCards(socialCards);
-    </script>
+function renderMembersList(){
+  const el=document.getElementById('members-list'); if(!el) return;
+  if(!S.myTeam?.members?.length){ el.innerHTML=`<div style="font-size:12px;color:var(--t3)">No members yet.</div>`; return; }
+  el.innerHTML=S.myTeam.members.map(m=>`
+    <div class="member-row">
+      <div class="member-info">
+        <div class="member-ava">${ini(m.username||'?')}</div>
+        <div><div class="member-name">${m.username||'Unknown'}</div><div class="member-id">${m.id}</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="role-tag${m.role==='MEMBER'?' member':''}">${m.role}</span>
+        ${m.role!=='OWNER'?`<button class="remove-btn" onclick="doRemoveMember('${m.id}')" title="Remove">✕</button>`:''}
+      </div>
+    </div>`).join('');
+}
 
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const hotspots = document.querySelectorAll(".hotspot");
-            const cards = document.querySelectorAll(".team-card");
+function openTeamModal(){
+  if(!S.myTeam) return;
+  document.getElementById('tm-name').textContent=S.myTeam.name;
+  clr('am-err','am-ok'); document.getElementById('am-uid').value='';
+  renderMembersList(); openOv('ov-team');
+}
 
-            hotspots.forEach(hotspot => {
-                hotspot.addEventListener("click", () => {
-                    const team = hotspot.dataset.team;
+/* ── LOAD ── */
+async function loadMyTeam(){
+  if(!S.user) return;
+  try{ S.myTeam=await api('/teams/my-team'); }
+  catch(e){ if(e.status!==404) console.warn('loadMyTeam:',e.message); S.myTeam=null; }
+  S.enrolled=false;
+  if(S.myTeam&&S.tournament){
+    try{
+      const regs=await api(`/tournaments/${S.tournament.id}/registrations`);
+      const arr=Array.isArray(regs)?regs:[];
+      S.enrolled=arr.some(r=>r.teamId===S.myTeam.id||r.team_id===S.myTeam.id);
+    }catch(e){}
+  }
+}
 
-                    cards.forEach(card => {
-                        card.classList.remove("is-visible");
-                    });
+async function loadAll(){
+  try{
+    const tours=await api('/tournaments');
+    const list=Array.isArray(tours)?tours:[];
+    if(!list.length){ renderEmpty('No tournament available yet.'); return; }
+    S.tournament=list[0];
+    const pub=await api(`/tournaments/${S.tournament.id}/public`);
+    S.pubView=pub;
+    S.teams=pub.teams||[];
+    S.rounds=pub.rounds||[];
+    S.matches=[...pub.rounds.flatMap(r=>r.matches||[]),...(pub.unassignedMatches||[])];
+    document.getElementById('err-bar').classList.remove('on');
+    await loadMyTeam(); renderAll();
+  }catch(e){
+    console.error('loadAll:',e);
+    document.getElementById('err-bar').classList.add('on');
+  }
+}
 
-                    const target = document.getElementById(`team-card-${team}`);
-                    if (target) {
-                        target.classList.add("is-visible");
-                    }
-                });
-            });
-        });
-    </script>
+function renderAll(){
+  renderHero(); renderBracket(); renderTeams(); renderMatches(); renderStandings(); renderMyZone();
+}
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const container = document.getElementById('model-container');
-            const wrapper = document.getElementById('model-wrapper');
+/* ── HERO ── */
+function renderHero(){
+  const t_=S.tournament;
+  const hasLive=S.matches.some(m=>m.status==='IN_PROGRESS');
+  const lb=document.getElementById('live-badge'); if(lb) lb.style.display=hasLive?'flex':'none';
+  const statusMap={OPEN:t('status_open'),CLOSED:t('status_closed'),IN_PROGRESS:t('status_progress'),FINISHED:t('status_finished')};
+  document.getElementById('hero-tag').textContent=statusMap[t_.status]||t_.status||'Active';
+  document.getElementById('st-teams').textContent=S.teams.length||'0';
+  document.getElementById('st-rounds').textContent=S.rounds.length||'0';
+  document.getElementById('st-matches').textContent=S.matches.length||'0';
+}
 
-            if (!container || !wrapper) return;
+/* ── BRACKET ── */
+function renderBracket(){
+  if(!S.rounds.length){
+    document.getElementById('bracket-root').innerHTML=`<div class="empty"><div class="empty-ico">🏆</div><div class="empty-title">${t('empty_bracket')}</div><div class="empty-sub">${t('empty_bracket_sub')}</div></div>`;
+    return;
+  }
+  const sr=[...S.rounds].sort((a,b)=>(a.orderIndex||0)-(b.orderIndex||0));
+  document.getElementById('bracket-badge').textContent=`${sr.length} rounds · ${S.matches.length} matches`;
+  let h=`<div class="bracket-scroll"><div class="bracket-body">`;
+  sr.forEach((r,ri)=>{
+    const ms=r.matches||[];
+    h+=`<div class="r-col"><div class="r-label">${r.name}</div><div class="r-matches">`;
+    if(!ms.length){
+      h+=`<div class="m-slot"><div class="m-card"><div class="m-team"><span class="m-tname tbd">${t('bracket_tbd')}</span></div></div></div>`;
+    } else {
+      ms.forEach(m=>{
+        const isLive=m.status==='IN_PROGRESS', isDone=m.status==='PLAYED';
+        const has=m.scoreA!==null&&m.scoreB!==null&&isDone;
+        const aWin=has&&m.winnerTeamId===m.teamAId, bWin=has&&m.winnerTeamId===m.teamBId;
+        h+=`<div class="m-slot"><div class="m-card${isLive?' live':''}">
+          ${isLive?'<div class="m-live-bar"></div>':''}
+          <div class="m-team${aWin?' won':bWin?' lost':''}">
+            <div class="m-logo">${m.teamA?ini(m.teamA):'?'}</div>
+            <span class="m-tname${!m.teamAId?' tbd':''}">${m.teamA||t('bracket_tbd')}</span>
+            ${has?`<span class="m-score${aWin?' w':''}">${m.scoreA}</span>`:''}
+          </div>
+          <div class="m-team${bWin?' won':aWin?' lost':''}">
+            <div class="m-logo">${m.teamB?ini(m.teamB):'?'}</div>
+            <span class="m-tname${!m.teamBId?' tbd':''}">${m.teamB||t('bracket_tbd')}</span>
+            ${has?`<span class="m-score${bWin?' w':''}">${m.scoreB}</span>`:''}
+          </div>
+        </div></div>`;
+      });
+    }
+    h+=`</div></div>`;
+    if(ri<sr.length-1) h+=`<div class="b-sep"><div class="b-line"></div></div>`;
+  });
+  const last=sr[sr.length-1];
+  const fm=(last?.matches||[])[0];
+  const champ=fm?.winnerTeamId?fm.winnerTeam||t('bracket_champion'):null;
+  h+=`<div class="b-winner"><div class="winner-card"><span class="winner-crown">🏆</span><div class="winner-lbl">${t('bracket_champion')}</div><div class="winner-name">${champ||'???'}</div></div></div></div></div>`;
+  document.getElementById('bracket-root').innerHTML=h;
+}
 
-            container.addEventListener('mousemove', (e) => {
-                const rect = container.getBoundingClientRect();
-                const x = (e.clientX - rect.left) / rect.width - 0.5;
-                const y = (e.clientY - rect.top) / rect.height - 0.5;
+/* ── MY ZONE ── */
+function renderMyZone(){
+  const el=document.getElementById('myzone-root'); if(!S.user){ el.innerHTML=''; return; }
+  if(!S.myTeam){
+    el.innerHTML=`<div class="my-zone"><div class="mz-head"><div class="mz-title">My Zone</div><div class="mz-btns"><button class="nb nb-blue" onclick="openOv('ov-cteam')">+ Create Team</button></div></div><p style="font-size:13px;color:var(--t3);line-height:1.7">You don't have a team yet. Create one to enroll in the tournament.</p></div>`;
+    return;
+  }
+  const t=S.myTeam;
+  const allM=S.matches.filter(m=>m.teamAId===t.id||m.teamBId===t.id);
+  const wins=allM.filter(m=>m.winnerTeamId===t.id).length;
+  const played=allM.filter(m=>m.status==='PLAYED').length;
+  const isOwner=t.members?.some(m=>m.id===S.user.id&&m.role==='OWNER');
+  el.innerHTML=`<div class="my-zone has"><div class="mz-head"><div class="mz-title">My Team<span>${t.name}</span></div><div class="mz-btns">
+    ${isOwner?`<button class="nb" onclick="openTeamModal()">Manage Team</button>`:''}
+    ${isOwner&&!S.enrolled?`<button class="nb nb-blue" onclick="openEnroll()">Enroll in Tournament</button>`:''}
+    ${S.enrolled?`<div class="enrolled-tag">✓ Enrolled</div>`:''}
+  </div></div>
+  <div class="mz-stats">
+    <div class="mz-s"><div class="mz-s-n">${t.members?.length||1}</div><div class="mz-s-l">Members</div></div>
+    <div class="mz-s"><div class="mz-s-n">${played}</div><div class="mz-s-l">Played</div></div>
+    <div class="mz-s"><div class="mz-s-n" style="color:var(--green);text-shadow:0 0 10px var(--green)">${wins}</div><div class="mz-s-l">Wins</div></div>
+    <div class="mz-s"><div class="mz-s-n" style="font-size:14px;font-weight:700;font-family:var(--body);color:${S.enrolled?'var(--green)':'var(--t3)'}">${S.enrolled?'Enrolled':'Not enrolled'}</div><div class="mz-s-l">Tournament</div></div>
+  </div></div>`;
+}
 
-                const rotateX = y * -14;
-                const rotateY = x * 14;
-                const moveX = x * 18;
-                const moveY = y * 18;
+/* ── TEAMS ── */
+function renderTeams(){
+  document.getElementById('teams-badge').textContent=`${S.teams.length} teams`;
+  if(!S.teams.length){
+    document.getElementById('teams-root').innerHTML=`<div class="empty" style="grid-column:1/-1"><div class="empty-ico">👥</div><div class="empty-title">${t('empty_teams')}</div></div>`;
+    return;
+  }
+  document.getElementById('teams-root').innerHTML=S.teams.map(t=>{
+    const id=t.teamId;
+    const tMs=S.matches.filter(m=>m.teamAId===id||m.teamBId===id);
+    const wins=tMs.filter(m=>m.winnerTeamId===id).length;
+    const played=tMs.filter(m=>m.status==='PLAYED').length;
+    const mine=S.myTeam?.id===id;
+    const logo=t.logoUrl?`<img src="${t.logoUrl}" alt="${ini(t.name)}" loading="lazy">`:`${ini(t.name)}`;
+    return `<div class="t-card${mine?' mine':''}">
+      <div class="t-banner"><div class="t-banner-ph">${ini(t.name)}</div></div>
+      <div class="t-body">
+        <div class="t-ident">
+          <div class="t-logo">${logo}</div>
+          <div><div class="t-name">${t.name}</div><div class="t-tag">${t.tag||''}</div>${mine?'<div class="t-mine-tag">MY TEAM</div>':''}</div>
+        </div>
+        <div class="t-row">
+          <div class="t-st"><div class="t-st-n">${played}</div><div class="t-st-l">Played</div></div>
+          <div class="t-st"><div class="t-st-n">${wins}</div><div class="t-st-l">Wins</div></div>
+          <div class="t-st"><div class="t-st-n">${played>0?Math.round(wins/played*100):0}%</div><div class="t-st-l">WR</div></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
 
-                wrapper.style.transform = `
-            translate(${moveX}px, ${moveY}px)
-            rotateX(${rotateX}deg)
-            rotateY(${rotateY}deg)
-            scale(1.05)
-        `;
-            });
+/* ── MATCHES ── */
+function renderMatches(){
+  const sr=[...S.rounds].sort((a,b)=>(a.orderIndex||0)-(b.orderIndex||0));
+  document.getElementById('round-filter').innerHTML=
+    `<button class="rfbtn${S.roundFilter===null?' on':''}" onclick="setRF(null)">All</button>`+
+    sr.map(r=>`<button class="rfbtn${S.roundFilter===r.id?' on':''}" onclick="setRF('${r.id}')">${r.name}</button>`).join('');
+  const vis=S.roundFilter?S.matches.filter(m=>m.roundId===S.roundFilter):S.matches;
+  if(!vis.length){
+    document.getElementById('matches-root').innerHTML=`<div class="empty"><div class="empty-ico">🎮</div><div class="empty-title">${t('empty_matches')}</div></div>`;
+    return;
+  }
+  document.getElementById('matches-root').innerHTML=vis.map(m=>{
+    const r=S.rounds.find(x=>x.id===m.roundId);
+    const isLive=m.status==='IN_PROGRESS', isDone=m.status==='PLAYED';
+    const has=m.scoreA!==null&&m.scoreB!==null&&isDone;
+    const aWin=has&&m.winnerTeamId===m.teamAId, bWin=has&&m.winnerTeamId===m.teamBId;
+    return `<div class="mr${isLive?' live':isDone?' done':''}">
+      <div class="mr-side">
+        <div class="mr-logo">${m.teamA?ini(m.teamA):'?'}</div>
+        <div><div class="mr-tname${aWin?' w':bWin?' l':''}">${m.teamA||'TBD'}</div></div>
+      </div>
+      <div class="mr-center">
+        ${r?.name?`<div class="mr-meta" style="margin-bottom:5px">${r.name}</div>`:''}
+        ${has?`<div class="mr-score">${m.scoreA} — ${m.scoreB}</div>`:isLive?`<div class="mr-vs" style="color:var(--red)">LIVE</div>`:`<div class="mr-vs">VS</div>`}
+        <div class="mr-status${isLive?' live':''}">${isLive?'live':isDone?'finished':'pending'}</div>
+      </div>
+      <div class="mr-side right">
+        <div><div class="mr-tname${bWin?' w':aWin?' l':''}" style="text-align:right">${m.teamB||'TBD'}</div></div>
+        <div class="mr-logo">${m.teamB?ini(m.teamB):'?'}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function setRF(id){ S.roundFilter=id; renderMatches(); }
 
-            container.addEventListener('mouseleave', () => {
-                wrapper.style.transform =
-                    'translate(0,0) rotateX(0deg) rotateY(0deg) scale(1)';
-            });
-        });
-    </script>
+/* ── STANDINGS ── */
+function renderStandings(){
+  if(!S.teams.length){
+    document.getElementById('standings-root').innerHTML=`<div class="empty"><div class="empty-ico">📊</div><div class="empty-title">No Standings Yet</div></div>`;
+    document.getElementById('standings-badge').textContent='—'; return;
+  }
+  const rows=S.teams.map(t=>{
+    const id=t.teamId;
+    const ms=S.matches.filter(m=>(m.teamAId===id||m.teamBId===id)&&m.status==='PLAYED');
+    const w=ms.filter(m=>m.winnerTeamId===id).length;
+    const gf=ms.reduce((s,m)=>s+(m.teamAId===id?(m.scoreA||0):(m.scoreB||0)),0);
+    const ga=ms.reduce((s,m)=>s+(m.teamAId===id?(m.scoreB||0):(m.scoreA||0)),0);
+    return {t,w,l:ms.length-w,p:ms.length,pts:w*3,gf,ga};
+  }).sort((a,b)=>b.pts-a.pts||b.w-a.w||b.gf-a.gf);
+  document.getElementById('standings-badge').textContent=S.tournament?.name||'—';
+  document.getElementById('standings-root').innerHTML=`<div class="st-wrap"><table class="st-table">
+    <thead><tr><th>#</th><th>Team</th><th>P</th><th>W</th><th>L</th><th>GF</th><th>GA</th><th>Pts</th></tr></thead>
+    <tbody>${rows.map((s,i)=>{
+      const rc=i===0?'g':i===1?'s':i===2?'b':'';
+      const lg=s.t.logoUrl?`<div class="st-logo"><img src="${s.t.logoUrl}" alt=""></div>`:`<div class="st-logo">${ini(s.t.name)}</div>`;
+      return `<tr class="st-tr"><td><div class="st-rk${rc?' '+rc:''}">${String(i+1).padStart(2,'0')}</div></td>
+        <td><div class="st-team">${lg}<div><div class="st-tn">${s.t.name}</div><div class="st-ttag">${s.t.tag||''}</div></div></div></td>
+        <td><div class="st-num">${s.p}</div></td><td><div class="st-num">${s.w}</div></td>
+        <td><div class="st-num">${s.l}</div></td><td><div class="st-num">${s.gf}</div></td>
+        <td><div class="st-num">${s.ga}</div></td><td><div class="st-pts">${s.pts}</div></td></tr>`;
+    }).join('')}</tbody></table></div>`;
+}
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+function renderEmpty(m){
+  document.getElementById('hero-tag').textContent='Coming Soon';
+  document.getElementById('hero-sub').textContent=m||'The tournament will appear here once it is created.';
+  ['bracket-root','teams-root','matches-root','standings-root'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.innerHTML=`<div class="empty"><div class="empty-ico">🏁</div><div class="empty-title">No Data Yet</div><div class="empty-sub">${m||'Check back soon'}</div></div>`;
+  });
+}
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const MATCHES_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQaWN5ccBvxvrpJpZEBRNjdM-VJEP9hiTWoqlANz_PtmwIj9JjCEisGUGBboEO4bqdbWgdRajWghXFg/pub?gid=0&single=true&output=csv';
-
-            const SOCIAL_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQaWN5ccBvxvrpJpZEBRNjdM-VJEP9hiTWoqlANz_PtmwIj9JjCEisGUGBboEO4bqdbWgdRajWghXFg/pub?gid=130494887&single=true&output=csv';
-
-            // ----------- CARGAR PARTIDOS -----------
-            Papa.parse(MATCHES_URL, {
-                download: true,
-                header: true,
-                skipEmptyLines: true,
-                complete: function (results) {
-                    console.log('Datos de partidos recibidos:', results.data);
-
-                    const container = document.getElementById('matches-container');
-                    if (!container) {
-                        console.error('No se encontró el contenedor matches-container');
-                        return;
-                    }
-
-                    const matches = results.data;
-                    container.innerHTML = '';
-
-
-                    if (matches.length > 0) {
-                        console.log('Columnas disponibles:', Object.keys(matches[0]));
-                    }
-
-                    matches.reverse().forEach((match, index) => {
-                        console.log(`Partido ${index}:`, match);
-
-
-                        const rival = match.rival || match.Rival || match.RIVAL || '';
-                        const equipo = match.equipo || match.Equipo || match.EQUIPO || 'Code Genius';
-                        const fecha = match.fecha || match.Fecha || match.FECHA || '';
-                        const hora = match.hora || match.Hora || match.HORA || '--:--';
-
-                        const puntosNosotros = match.puntosCG || match.PuntosCG || match.puntoscg || null;
-                        const puntosRival = match.puntosRival || match.PuntosRival || match.puntosrival || null;
-
-                        console.log(`Puntos - Nosotros: ${puntosNosotros}, Rival: ${puntosRival}`);
-
-                        if (!rival || rival.trim() === '') return;
-
-                        let statusClass = 'status-upcoming';
-                        let outcomeClass = 'match-outcome--draw';
-                        let outcomeText = 'Pendiente';
-                        let metaHTML = '';
-
-                        const nosotros = puntosNosotros ? parseInt(String(puntosNosotros).trim()) : null;
-                        const rivalPts = puntosRival ? parseInt(String(puntosRival).trim()) : null;
-
-                        console.log(`Puntos parseados - Nosotros: ${nosotros}, Rival: ${rivalPts}`);
-
-                        if (nosotros !== null && rivalPts !== null && !isNaN(nosotros) && !isNaN(rivalPts)) {
-                            if (nosotros > rivalPts) {
-                                statusClass = 'status-winned';
-                                outcomeClass = 'match-outcome--win';
-                                outcomeText = 'Victoria';
-                            } else if (nosotros < rivalPts) {
-                                statusClass = 'status-lost';
-                                outcomeClass = 'match-outcome--loss';
-                                outcomeText = 'Derrota';
-                            } else {
-                                outcomeClass = 'match-outcome--draw';
-                                outcomeText = 'Empate';
-                            }
-
-                            metaHTML = `<p class="match-meta">${nosotros} - ${rivalPts}</p>`;
-                        }
-
-                        const dateParts = fecha ? fecha.split(/[-/]/) : ['--', 'MES'];
-                        const day = dateParts[0] || '--';
-                        const month = dateParts[1] || 'MES';
-
-                        const slide = document.createElement('div');
-                        slide.classList.add('swiper-slide');
-                        slide.innerHTML = `
-                    <article class="match-card ${statusClass}">
-                        <h3 class="match-title">${equipo} vs ${rival}</h3>
-                        
-                        <div class="match-date">
-                            <span class="day">${day}</span>
-                            <span class="month">${month.toUpperCase()}</span>
-                            <span class="time">${hora}</span>
-                        </div>
-                        
-                        <p class="match-outcome ${outcomeClass}">
-                            ${outcomeText}
-                        </p>
-                        
-                        ${metaHTML}
-                    </article>
-                `;
-                        container.appendChild(slide);
-                    });
-
-                    initMatchesSwiper();
-                },
-                error: function (err) {
-                    console.error("Error cargando partidos:", err);
-                }
-            });
-
-            // ----------- CALENDARIO SOCIAL -----------
-            Papa.parse(SOCIAL_URL, {
-                download: true,
-                header: true,
-                skipEmptyLines: true,
-                complete: function (results) {
-                    console.log('Datos de eventos sociales recibidos:', results.data);
-
-                    const container = document.getElementById('social-container');
-                    if (!container) {
-                        console.error('No se encontró el contenedor social-container');
-                        return;
-                    }
-
-                    const events = results.data;
-                    container.innerHTML = '';
-
-                    if (events.length > 0) {
-                        console.log('Columnas disponibles (social):', Object.keys(events[0]));
-                    }
-
-                    events.forEach((event, index) => {
-                        console.log(`Evento ${index}:`, event);
-
-                        const titulo = event.titulo || event.Titulo || event.TITULO ||
-                            event.título || event.Título || event.TÍTULO || '';
-                        const descripcion = event.descripcion || event.Descripcion || event.DESCRIPCION ||
-                            event.descripción || event.Descripción || event.DESCRIPCIÓN || '';
-                        const fecha = event.fecha || event.Fecha || event.FECHA || '';
-                        const hora = event.hora || event.Hora || event.HORA || '';
-
-                        if (!titulo || titulo.trim() === '') return;
-
-                        const dateParts = fecha ? fecha.split(/[-/]/) : ['--', 'MES'];
-                        const day = dateParts[0] || '--';
-                        const month = dateParts[1] || 'MES';
-
-                        const slide = document.createElement('div');
-                        slide.classList.add('swiper-slide');
-                        slide.innerHTML = `
-                    <article class="social-card">
-                        <h3 class="social-title">${titulo}</h3>
-                        <div class="social-date">
-                            <span class="day">${day}</span>
-                            <span class="month">${month.toUpperCase()}</span>
-                            <span class="time">${hora}</span>
-                        </div>
-                        <p class="social-meta">
-                            ${descripcion}
-                        </p>
-                    </article>
-                `;
-                        container.appendChild(slide);
-                    });
-
-                    initSocialSwiper();
-                },
-                error: function (err) {
-                    console.error("Error cargando eventos sociales:", err);
-                }
-            });
-
-            // ----------- INICIALIZAR SWIPERS -----------
-            function initMatchesSwiper() {
-                new Swiper(".calendar-swiper", {
-                    slidesPerView: 1,
-                    spaceBetween: 20,
-                    grabCursor: true,
-                    loop: false,
-                    pagination: {
-                        el: ".calendar-swiper .swiper-pagination",
-                        clickable: true,
-                    },
-                    navigation: {
-                        nextEl: ".calendar-swiper .swiper-button-next",
-                        prevEl: ".calendar-swiper .swiper-button-prev",
-                    },
-                    breakpoints: {
-                        640: {
-                            slidesPerView: 2,
-                            spaceBetween: 20
-                        },
-                        900: {
-                            slidesPerView: 3,
-                            spaceBetween: 20
-                        }
-                    }
-                });
-            }
-
-            function initSocialSwiper() {
-                new Swiper(".social-swiper", {
-                    slidesPerView: 1,
-                    spaceBetween: 20,
-                    grabCursor: true,
-                    loop: false,
-                    pagination: {
-                        el: ".social-swiper .swiper-pagination",
-                        clickable: true,
-                    },
-                    navigation: {
-                        nextEl: ".social-swiper .swiper-button-next",
-                        prevEl: ".social-swiper .swiper-button-prev",
-                    },
-                    breakpoints: {
-                        640: {
-                            slidesPerView: 2,
-                            spaceBetween: 20
-                        },
-                        900: {
-                            slidesPerView: 3,
-                            spaceBetween: 20
-                        }
-                    }
-                });
-            }
-
-            document.addEventListener("click", (e) => {
-                const card = e.target.closest(".match-card, .social-card");
-                if (!card) return;
-
-                const selector = card.classList.contains('match-card') ? '.match-card' : '.social-card';
-                document.querySelectorAll(`${selector}.is-selected`).forEach(c => c.classList.remove("is-selected"));
-                card.classList.add("is-selected");
-            });
-        });
-    </script>
+renderNav(); applyLang(); loadAll(); setInterval(loadAll,30000);
+</script>
 </body>
-
 </html>
